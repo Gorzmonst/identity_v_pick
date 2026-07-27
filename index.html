@@ -1198,7 +1198,10 @@ function renderPool(filter = "all") {
 
 function filterPool(type) {
   document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-  event.target.classList.add("active");
+  const btns = document.querySelectorAll(".filter-btn");
+  if (type === "survivor") btns[0].classList.add("active");
+  else if (type === "hunter") btns[1].classList.add("active");
+  else btns[2].classList.add("active");
   renderPool(type);
 }
 
@@ -1308,7 +1311,14 @@ function resetAll() {
   document.querySelectorAll(".slot").forEach(s => s.innerHTML = "");
   bannedNames.clear();
   document.getElementById("status-msg").textContent = "";
-  renderPool();
+
+  // フィルターボタンを初期状態（サバイバー）に戻す
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  const survivorBtn = [...document.querySelectorAll(".filter-btn")]
+    .find(b => b.textContent.includes("サバイバー"));
+  if (survivorBtn) survivorBtn.classList.add("active");
+
+  renderPool("survivor");
   checkCompleteButton();
   localStorage.removeItem(STORAGE_KEY);
   saveState();
