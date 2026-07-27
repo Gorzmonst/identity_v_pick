@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第五人格 大会ピックシミュレーター</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0d12;
+    --panel: #1a1a24;
+    --border: #333;
+    --border2: #3a3a50;
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --text-dim: #666;
+    --slot-bg: #12121a;
+    --slot-border: #444;
+    --over-bg: #2a2a40;
+    --gold: #c9a227;
+    --blue: #4a90e2;
+    --red: #e24a4a;
+    --green: #33aa66;
+    --btn-bg: #2a2a40;
+    --btn-text: #ddd;
+    --reject-bg: #4a1a1a;
+    --reset-bg: #3a1a1a;
+    --reset-border: #aa3333;
+    --reset-text: #ffaaaa;
+    --char-noimg: #2a2a3a;
+  }
+  body.light {
+    --bg: #f0f2f5;
+    --panel: #ffffff;
+    --border: #c8cdd4;
+    --border2: #b0b6c0;
+    --text: #1a1a24;
+    --text-muted: #666;
+    --text-dim: #888;
+    --slot-bg: #e8ebf0;
+    --slot-border: #aab0bb;
+    --over-bg: #d0d5de;
+    --gold: #b8941f;
+    --blue: #2a6fbf;
+    --red: #c93a3a;
+    --green: #228844;
+    --btn-bg: #e4e7ed;
+    --btn-text: #222;
+    --reject-bg: #f8d0d0;
+    --reset-bg: #f5e0e0;
+    --reset-border: #cc6666;
+    --reset-text: #aa3333;
+    --char-noimg: #d8dce4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
+    height: 100vh;
+    max-height: 1080px;
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+    overflow: hidden;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  /* ===== 左サイドバー ===== */
+  .sidebar {
+    width: 132px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 7px;
+    overflow-y: auto;
+  }
+  .sidebar h1 {
+    color: var(--gold);
+    font-size: 0.85em;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 2px;
+    text-shadow: 0 0 6px rgba(201,162,39,0.35);
+  }
+  body.light .sidebar h1 { text-shadow: none; }
+  .side-label {
+    font-size: 0.72em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+    width: 100%;
+    padding: 7px 4px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    background: var(--btn-bg);
+    color: var(--btn-text);
+  }
+  .theme-btn {
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .mode-btn.active { background: var(--gold); color: #111; border-color: var(--gold); }
+  .round-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .round-btn.ot.active { background: var(--red); border-color: var(--red); }
+  .complete-btn {
+    background: linear-gradient(135deg, var(--green), #1a6b3a);
+    border: none;
+    color: #fff;
+    margin-top: 6px;
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+  .complete-btn:disabled {
+    background: var(--btn-bg);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+  .complete-btn:not(:disabled):hover { filter: brightness(1.1); }
+  .save-btn {
+    background: linear-gradient(135deg, var(--gold), #a8841a);
+    color: #111;
+    border: none;
+  }
+  .save-btn:hover { filter: brightness(1.08); }
+  .reset-btn {
+    background: var(--reset-bg);
+    border: 1px solid var(--reset-border);
+    color: var(--reset-text);
+    margin-top: auto;
+  }
+  .status-msg {
+    font-size: 11px;
+    text-align: center;
+    color: var(--green);
+    line-height: 1.35;
+    min-height: 32px;
+    padding: 4px 2px;
+    word-break: break-all;
+  }
+  body.light .status-msg { color: #1a7a3a; }
+
+  /* ===== メインエリア ===== */
+  .main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  #capture-area {
+    background: var(--bg);
+    padding: 5px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .global-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .global-box {
+    flex: 1;
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px 6px;
+    min-width: 0;
+  }
+  .global-box.surv { border-color: var(--blue); }
+  .global-box.hunt { border-color: var(--red); }
+  .global-title {
+    font-size: 0.74em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .round-block {
+    margin-bottom: 4px;
+    padding: 3px;
+    border-radius: 4px;
+    transition: 0.15s;
+  }
+  .round-block.active-round {
+    background: rgba(74, 144, 226, 0.15);
+    outline: 1px solid var(--blue);
+  }
+  .round-block.active-round.ot {
+    background: rgba(226, 74, 74, 0.15);
+    outline: 1px solid var(--red);
+  }
+  body.light .round-block.active-round {
+    background: rgba(42, 111, 191, 0.12);
+  }
+  body.light .round-block.active-round.ot {
+    background: rgba(201, 58, 58, 0.12);
+  }
+
+  .round-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    align-items: flex-start;
+  }
+  .used-area, .ban-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .used-area { align-items: flex-start; }
+  .ban-area { align-items: flex-end; }
+  .area-label {
+    font-size: 0.62em;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .round-block.active-round .area-label { color: var(--blue); font-weight: bold; }
+  .round-block.active-round.ot .area-label { color: var(--red); }
+
+  .slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 48px;
+  }
+  .used-area .slots { justify-content: flex-start; }
+  .ban-area .slots { justify-content: flex-end; }
+
+  .teams {
+    display: flex;
+    gap: 8px;
+  }
+  .team {
+    flex: 1;
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 6px 7px;
+    min-width: 0;
+  }
+  .team-a { border-color: var(--blue); }
+  .team-b { border-color: var(--red); }
+  .team-name {
+    text-align: center;
+    font-size: 1.05em;
+    font-weight: bold;
+    margin-bottom: 4px;
+    outline: none;
+  }
+  .team-a .team-name { color: var(--blue); }
+  .team-b .team-name { color: var(--red); }
+  .section-title {
+    font-size: 0.7em;
+    color: var(--text-muted);
+    margin: 4px 0 3px;
+  }
+
+  .slot {
+    width: 48px;
+    height: 58px;
+    background: var(--slot-bg);
+    border: 2px dashed var(--slot-border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.12s;
+    position: relative;
+  }
+  .slot.ban { border-color: var(--red); }
+  .slot.pick { border-color: var(--green); }
+  .slot.over { background: var(--over-bg); border-style: solid; }
+  .slot.reject {
+    background: var(--reject-bg) !important;
+    border-color: var(--red) !important;
+  }
+
+  .clear-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 17px;
+    height: 17px;
+    background: #c33;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  .clear-btn:hover { background: #e44; }
+
+  .char {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .char img {
+    width: 34px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 3px;
+    background: var(--char-noimg);
+  }
+  .char .name {
+    font-size: 7.5px;
+    line-height: 1.05;
+    margin-top: 2px;
+    text-align: center;
+    max-width: 44px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .char.no-img { background: var(--char-noimg); }
+  .char.no-img .name { font-size: 9px; white-space: normal; }
+  .char.survivor { border-left: 2px solid var(--blue); }
+  .char.hunter { border-left: 2px solid var(--red); }
+  .char.dragging { opacity: 0.4; }
+  .char.banned {
+    opacity: 0.38;
+    filter: grayscale(70%);
+  }
+
+  .pool {
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 6px 7px;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pool-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-btn {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border: 1px solid var(--border2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .filter-btn.active {
+    background: var(--gold);
+    color: #111;
+    border-color: var(--gold);
+  }
+  .char-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 56px);
+    gap: 3px;
+    overflow-y: auto;
+    flex: 1;
+    align-content: start;
+  }
+  .char-grid .char {
+    width: 56px;
+    height: 68px;
+    border: 1px solid var(--slot-border);
+  }
+  .char-grid .char img {
+    width: 40px;
+    height: 40px;
+  }
+  .char-grid .char .name {
+    font-size: 8.5px;
+    max-width: 52px;
+  }
+  .char-grid .char.no-img .name {
+    font-size: 10px;
+  }
+
+  /* ===== BO5 コンパクトモード ===== */
+  body.bo5 .slot {
+    width: 42px;
+    height: 50px;
+  }
+  body.bo5 .char img {
+    width: 28px;
+    height: 28px;
+  }
+  body.bo5 .char .name {
+    font-size: 6.5px;
+    max-width: 38px;
+  }
+  body.bo5 .char.no-img .name {
+    font-size: 8px;
+  }
+  body.bo5 .char-grid {
+    grid-template-columns: repeat(auto-fill, 48px);
+  }
+  body.bo5 .char-grid .char {
+    width: 48px;
+    height: 58px;
+  }
+  body.bo5 .char-grid .char img {
+    width: 34px;
+    height: 34px;
+  }
+  body.bo5 .char-grid .char .name {
+    font-size: 7.5px;
+    max-width: 44px;
+  }
+  body.bo5 .char-grid .char.no-img .name {
+    font-size: 9px;
+  }
+  body.bo5 .round-block {
+    margin-bottom: 2px;
+    padding: 2px;
+  }
+  body.bo5 .area-label {
+    font-size: 0.55em;
+  }
+  body.bo5 .global-box {
+    padding: 3px 4px;
+  }
+  body.bo5 .global-title {
+    font-size: 0.66em;
+  }
+  body.bo5 .slots {
+    gap: 3px;
+    min-height: 40px;
+  }
+  body.bo5 .clear-btn {
+    width: 15px;
+    height: 15px;
+    font-size: 11px;
+    top: -5px;
+    right: -5px;
+  }
+  body.bo5 .section-title {
+    font-size: 0.65em;
+    margin: 2px 0 2px;
+  }
+  body.bo5 .team {
+    padding: 4px 5px;
+  }
+  body.bo5 .team-name {
+    font-size: 0.92em;
+    margin-bottom: 2px;
+  }
+  body.bo5 .global-row {
+    margin-bottom: 5px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 左サイドバー -->
+<div class="sidebar">
+  <h1>第五人格<br>大会ピック<br>シミュレーター</h1>
+
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">ライトモードへ</button>
+
+  <div class="side-label">モード</div>
+  <button class="mode-btn active" id="btn-bo3" onclick="setMode('BO3')">BO3</button>
+  <button class="mode-btn" id="btn-bo5" onclick="setMode('BO5')">BO5</button>
+
+  <div class="side-label">現在ラウンド</div>
+  <div id="round-buttons" style="display:flex;flex-direction:column;gap:4px;"></div>
+
+  <button class="complete-btn" id="complete-btn" onclick="completePick()" disabled>
+    ピック完了<br>→グローバルBANへ
+  </button>
+  <button class="save-btn" onclick="saveAsImage()">画像で保存</button>
+  <div class="status-msg" id="status-msg"></div>
+  <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
+</div>
+
+<!-- メイン -->
+<div class="main">
+  <div id="capture-area">
+    <div class="global-row">
+      <div class="global-box surv">
+        <div class="global-title">グローバルBAN（サバイバー）</div>
+        <div id="global-surv-rounds"></div>
+      </div>
+      <div class="global-box hunt">
+        <div class="global-title">グローバルBAN（ハンター）</div>
+        <div id="global-hunt-rounds"></div>
+      </div>
+    </div>
+
+    <div class="teams">
+      <div class="team team-a">
+        <div class="team-name" contenteditable="true">TEAM A（サバイバー）</div>
+        <div class="section-title" id="teamA-ban-title">個別BAN（ハンター）</div>
+        <div class="slots" id="teamA-bans"></div>
+        <div class="section-title">PICK サバイバー</div>
+        <div class="slots" id="teamA-surv"></div>
+      </div>
+      <div class="team team-b">
+        <div class="team-name" contenteditable="true">TEAM B（ハンター）</div>
+        <div class="section-title">個別BAN（サバイバー 4体）</div>
+        <div class="slots" id="teamB-bans"></div>
+        <div class="section-title">PICK ハンター</div>
+        <div class="slots" id="teamB-hunter"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pool">
+    <div class="pool-controls">
+      <button class="filter-btn" onclick="filterPool('survivor')">サバイバー</button>
+      <button class="filter-btn" onclick="filterPool('hunter')">ハンター</button>
+      <button class="filter-btn active" onclick="filterPool('all')">全て</button>
+      <span style="margin-left:auto;color:var(--text-muted);font-size:0.75em;">BAN/使用中は薄暗く表示　×で枠を空に</span>
+    </div>
+    <div class="char-grid" id="char-pool"></div>
+  </div>
+</div>
+
+<script>
+const characters = [
+  {name:"幸運児", type:"survivor", img:""},
+  {name:"庭師", type:"survivor", img:""},
+  {name:"弁護士", type:"survivor", img:""},
+  {name:"医師", type:"survivor", img:""},
+  {name:"泥棒", type:"survivor", img:""},
+  {name:"マジシャン", type:"survivor", img:""},
+  {name:"冒険家", type:"survivor", img:""},
+  {name:"傭兵", type:"survivor", img:""},
+  {name:"空軍", type:"survivor", img:""},
+  {name:"機械技師", type:"survivor", img:""},
+  {name:"オフェンス", type:"survivor", img:""},
+  {name:"心眼", type:"survivor", img:""},
+  {name:"祭司", type:"survivor", img:""},
+  {name:"調香師", type:"survivor", img:""},
+  {name:"カウボーイ", type:"survivor", img:""},
+  {name:"踊り子", type:"survivor", img:""},
+  {name:"占い師", type:"survivor", img:""},
+  {name:"納棺師", type:"survivor", img:""},
+  {name:"探鉱者", type:"survivor", img:""},
+  {name:"呪術師", type:"survivor", img:""},
+  {name:"野人", type:"survivor", img:""},
+  {name:"曲芸師", type:"survivor", img:""},
+  {name:"一等航海士", type:"survivor", img:""},
+  {name:"バーメイド", type:"survivor", img:""},
+  {name:"ポストマン", type:"survivor", img:""},
+  {name:"墓守", type:"survivor", img:""},
+  {name:"囚人", type:"survivor", img:""},
+  {name:"昆虫学者", type:"survivor", img:""},
+  {name:"画家", type:"survivor", img:""},
+  {name:"バッツマン", type:"survivor", img:""},
+  {name:"玩具職人", type:"survivor", img:""},
+  {name:"患者", type:"survivor", img:""},
+  {name:"心理学者", type:"survivor", img:""},
+  {name:"小説家", type:"survivor", img:""},
+  {name:"少女", type:"survivor", img:""},
+  {name:"教授", type:"survivor", img:""},
+  {name:"骨董商", type:"survivor", img:""},
+  {name:"作曲家", type:"survivor", img:""},
+  {name:"記者", type:"survivor", img:""},
+  {name:"航空エンジニア", type:"survivor", img:""},
+  {name:"応援団", type:"survivor", img:""},
+  {name:"人形師", type:"survivor", img:""},
+  {name:"火災調査員", type:"survivor", img:""},
+  {name:"レディ・ファウロ", type:"survivor", img:""},
+  {name:"騎士", type:"survivor", img:""},
+  {name:"気象学者", type:"survivor", img:""},
+  {name:"弓使い", type:"survivor", img:""},
+  {name:"脱出マスター", type:"survivor", img:""},
+  {name:"幻灯師", type:"survivor", img:""},
+  {name:"闘牛士", type:"survivor", img:""},
+  {name:"マイムアーティスト", type:"survivor", img:""},
+
+  {name:"復讐者", type:"hunter", img:""},
+  {name:"道化師", type:"hunter", img:""},
+  {name:"リッパー", type:"hunter", img:""},
+  {name:"断罪狩人", type:"hunter", img:""},
+  {name:"結魂者", type:"hunter", img:""},
+  {name:"芸者", type:"hunter", img:""},
+  {name:"黄衣の王", type:"hunter", img:""},
+  {name:"写真家", type:"hunter", img:""},
+  {name:"狂眼", type:"hunter", img:""},
+  {name:"夢の魔女", type:"hunter", img:""},
+  {name:"泣き虫", type:"hunter", img:""},
+  {name:"魔トカゲ", type:"hunter", img:""},
+  {name:"血の女王", type:"hunter", img:""},
+  {name:"ガードNo.26", type:"hunter", img:""},
+  {name:"使徒", type:"hunter", img:""},
+  {name:"ヴァイオリニスト", type:"hunter", img:""},
+  {name:"彫刻家", type:"hunter", img:""},
+  {name:"アンデッド", type:"hunter", img:""},
+  {name:"破輪", type:"hunter", img:""},
+  {name:"漁師", type:"hunter", img:""},
+  {name:"蝋人形師", type:"hunter", img:""},
+  {name:"悪夢", type:"hunter", img:""},
+  {name:"書記官", type:"hunter", img:""},
+  {name:"隠者", type:"hunter", img:""},
+  {name:"夜の番人", type:"hunter", img:""},
+  {name:"オペラ歌手", type:"hunter", img:""},
+  {name:"フールズ・ゴールド", type:"hunter", img:""},
+  {name:"時空の影", type:"hunter", img:""},
+  {name:"足萎えの羊", type:"hunter", img:""},
+  {name:"フラバルー", type:"hunter", img:""},
+  {name:"雑貨商", type:"hunter", img:""},
+  {name:"ビリヤードプレイヤー", type:"hunter", img:""},
+  {name:"女王蜂", type:"hunter", img:""},
+  {name:"歯医者", type:"hunter", img:""}
+];
+
+const bannedNames = new Set();
+let currentMode = "BO3";
+let currentRound = "R1";
+let draggedChar = null;
+
+const ROUND_CONFIG = {
+  BO3: ["R1", "R2", "R3", "延長"],
+  BO5: ["R1", "R2", "R3", "R4", "R5", "延長"]
+};
+
+function getBanCounts(round) {
+  if (round === "R1") return { teamA: 0, teamB: 4 };
+  if (round === "R2") return { teamA: 1, teamB: 4 };
+  return { teamA: 2, teamB: 4 };
+}
+
+function addClearButton(slot) {
+  const existing = slot.querySelector(".clear-btn");
+  if (existing) existing.remove();
+  if (!slot.querySelector(".char")) return;
+
+  const btn = document.createElement("button");
+  btn.className = "clear-btn";
+  btn.innerHTML = "×";
+  btn.title = "この枠を空にする";
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    slot.innerHTML = "";
+    updateBanned();
+    checkCompleteButton();
+  };
+  slot.appendChild(btn);
+}
+
+function createCharElement(data, isPool = false) {
+  const div = document.createElement("div");
+  div.className = `char ${data.type}` + (data.img ? "" : " no-img");
+  if (isPool && bannedNames.has(data.name)) div.classList.add("banned");
+  div.draggable = true;
+  div.dataset.name = data.name;
+  div.dataset.type = data.type;
+  div.dataset.img = data.img || "";
+
+  if (data.img) {
+    const img = document.createElement("img");
+    img.src = data.img;
+    img.alt = data.name;
+    img.onerror = () => {
+      div.classList.add("no-img");
+      div.innerHTML = "";
+      const ns = document.createElement("div");
+      ns.className = "name";
+      ns.textContent = data.name;
+      div.appendChild(ns);
+    };
+    div.appendChild(img);
+  }
+  const nameSpan = document.createElement("div");
+  nameSpan.className = "name";
+  nameSpan.textContent = data.name;
+  div.appendChild(nameSpan);
+
+  div.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", JSON.stringify({
+      name: data.name, type: data.type, img: data.img || ""
+    }));
+    draggedChar = div;
+    div.classList.add("dragging");
+  });
+  div.addEventListener("dragend", () => {
+    div.classList.remove("dragging");
+    draggedChar = null;
+  });
+  return div;
+}
+
+function makeDroppable(slot, allowedType) {
+  slot.dataset.allowed = allowedType;
+
+  slot.addEventListener("dragover", e => {
+    e.preventDefault();
+    slot.classList.add("over");
+  });
+  slot.addEventListener("dragleave", () => {
+    slot.classList.remove("over");
+    slot.classList.remove("reject");
+  });
+  slot.addEventListener("drop", e => {
+    e.preventDefault();
+    slot.classList.remove("over");
+    slot.classList.remove("reject");
+
+    let data;
+    try {
+      data = JSON.parse(e.dataTransfer.getData("text/plain"));
+    } catch { return; }
+
+    if (data.type !== allowedType) {
+      slot.classList.add("reject");
+      setTimeout(() => slot.classList.remove("reject"), 450);
+      return;
+    }
+
+    const isMovingFromSlot = draggedChar && draggedChar.closest(".slot");
+    if (bannedNames.has(data.name) && !isMovingFromSlot) {
+      slot.classList.add("reject");
+      setTimeout(() => slot.classList.remove("reject"), 450);
+      return;
+    }
+
+    const sourceSlot = draggedChar ? draggedChar.closest(".slot") : null;
+
+    slot.innerHTML = "";
+    slot.appendChild(createCharElement(data));
+    addClearButton(slot);
+
+    if (sourceSlot && sourceSlot !== slot) {
+      sourceSlot.innerHTML = "";
+    }
+
+    updateBanned();
+    checkCompleteButton();
+  });
+}
+
+function createSlotsInContainer(container, count, cssType, allowedType) {
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const slot = document.createElement("div");
+    slot.className = `slot ${cssType}`;
+    makeDroppable(slot, allowedType);
+    container.appendChild(slot);
+  }
+}
+
+function buildGlobalRounds() {
+  const survC = document.getElementById("global-surv-rounds");
+  const huntC = document.getElementById("global-hunt-rounds");
+  survC.innerHTML = "";
+  huntC.innerHTML = "";
+
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const counts = getBanCounts(r);
+
+    // サバイバー側
+    const sBlock = document.createElement("div");
+    sBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
+    sBlock.dataset.round = r;
+    
+    const sContent = document.createElement("div");
+    sContent.className = "round-content";
+    
+    const sUsed = document.createElement("div");
+    sUsed.className = "used-area";
+    sUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
+    const sUsedSlots = document.createElement("div");
+    sUsedSlots.className = "slots";
+    sUsedSlots.id = `global-surv-used-${r}`;
+    sUsed.appendChild(sUsedSlots);
+    
+    const sBan = document.createElement("div");
+    sBan.className = "ban-area";
+    sBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
+    const sBanSlots = document.createElement("div");
+    sBanSlots.className = "slots";
+    sBanSlots.id = `global-surv-ban-${r}`;
+    sBan.appendChild(sBanSlots);
+    
+    sContent.appendChild(sUsed);
+    sContent.appendChild(sBan);
+    sBlock.appendChild(sContent);
+    survC.appendChild(sBlock);
+    
+    createSlotsInContainer(sUsedSlots, 4, "pick", "survivor");
+    createSlotsInContainer(sBanSlots, counts.teamA, "ban", "hunter");
+
+    // ハンター側
+    const hBlock = document.createElement("div");
+    hBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
+    hBlock.dataset.round = r;
+    
+    const hContent = document.createElement("div");
+    hContent.className = "round-content";
+    
+    const hUsed = document.createElement("div");
+    hUsed.className = "used-area";
+    hUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
+    const hUsedSlots = document.createElement("div");
+    hUsedSlots.className = "slots";
+    hUsedSlots.id = `global-hunt-used-${r}`;
+    hUsed.appendChild(hUsedSlots);
+    
+    const hBan = document.createElement("div");
+    hBan.className = "ban-area";
+    hBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
+    const hBanSlots = document.createElement("div");
+    hBanSlots.className = "slots";
+    hBanSlots.id = `global-hunt-ban-${r}`;
+    hBan.appendChild(hBanSlots);
+    
+    hContent.appendChild(hUsed);
+    hContent.appendChild(hBan);
+    hBlock.appendChild(hContent);
+    huntC.appendChild(hBlock);
+    
+    createSlotsInContainer(hUsedSlots, 1, "pick", "hunter");
+    createSlotsInContainer(hBanSlots, counts.teamB, "ban", "survivor");
+  });
+
+  updateBanned();
+}
+
+function rebuildTeamBans() {
+  const counts = getBanCounts(currentRound);
+  
+  createSlotsInContainer(document.getElementById("teamA-bans"), counts.teamA, "ban", "hunter");
+  
+  const title = document.getElementById("teamA-ban-title");
+  if (counts.teamA === 0) {
+    title.textContent = "個別BAN（このラウンドは不可）";
+  } else {
+    title.textContent = `個別BAN（ハンター ${counts.teamA}体）`;
+  }
+  
+  createSlotsInContainer(document.getElementById("teamB-bans"), counts.teamB, "ban", "survivor");
+  updateBanned();
+}
+
+function buildRoundButtons() {
+  const container = document.getElementById("round-buttons");
+  container.innerHTML = "";
+  const rounds = ROUND_CONFIG[currentMode];
+  if (!rounds.includes(currentRound)) currentRound = rounds[0];
+
+  rounds.forEach(r => {
+    const btn = document.createElement("button");
+    btn.className = "round-btn" + (r === "延長" ? " ot" : "") + (r === currentRound ? " active" : "");
+    btn.textContent = r;
+    btn.onclick = () => setCurrentRound(r);
+    container.appendChild(btn);
+  });
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById("btn-bo3").classList.toggle("active", mode === "BO3");
+  document.getElementById("btn-bo5").classList.toggle("active", mode === "BO5");
+  document.body.classList.toggle("bo5", mode === "BO5");
+  buildRoundButtons();
+  buildGlobalRounds();
+  rebuildTeamBans();
+}
+
+function setCurrentRound(r) {
+  currentRound = r;
+  document.querySelectorAll(".round-btn").forEach(b => b.classList.toggle("active", b.textContent === r));
+  document.querySelectorAll(".round-block").forEach(b => {
+    b.classList.toggle("active-round", b.dataset.round === r);
+  });
+  rebuildTeamBans();
+}
+
+function renderPool(filter = "all") {
+  const pool = document.getElementById("char-pool");
+  pool.innerHTML = "";
+  characters.forEach(c => {
+    if (filter !== "all" && c.type !== filter) return;
+    pool.appendChild(createCharElement(c, true));
+  });
+}
+
+function filterPool(type) {
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  renderPool(type);
+}
+
+function updateBanned() {
+  bannedNames.clear();
+
+  ROUND_CONFIG[currentMode].forEach(r => {
+    [`global-surv-used-${r}`, `global-surv-ban-${r}`, `global-hunt-used-${r}`, `global-hunt-ban-${r}`].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+    });
+  });
+
+  ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+  });
+
+  const active = document.querySelector(".filter-btn.active");
+  let f = "all";
+  if (active?.textContent.includes("サバイバー")) f = "survivor";
+  else if (active?.textContent.includes("ハンター")) f = "hunter";
+  renderPool(f);
+  checkCompleteButton();
+}
+
+function checkCompleteButton() {
+  const s = document.getElementById("teamA-surv").querySelectorAll(".char").length;
+  const h = document.getElementById("teamB-hunter").querySelectorAll(".char").length;
+  document.getElementById("complete-btn").disabled = !(s === 4 && h === 1);
+}
+
+function completePick() {
+  const survChars = [...document.getElementById("teamA-surv").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+  const huntChars = [...document.getElementById("teamB-hunter").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+  const teamABans = [...document.getElementById("teamA-bans").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+  const teamBBans = [...document.getElementById("teamB-bans").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+
+  if (survChars.length !== 4 || huntChars.length !== 1) {
+    document.getElementById("status-msg").textContent = "サバイバー4体とハンター1体をすべてピックしてください";
+    return;
+  }
+  if (survChars.some(c => c.type !== "survivor") || huntChars.some(c => c.type !== "hunter")) {
+    document.getElementById("status-msg").textContent = "役職が正しくありません";
+    return;
+  }
+
+  const sUsed = document.getElementById(`global-surv-used-${currentRound}`);
+  const hUsed = document.getElementById(`global-hunt-used-${currentRound}`);
+  if (sUsed) {
+    sUsed.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (survChars[i]) {
+        slot.appendChild(createCharElement(survChars[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+  if (hUsed) {
+    hUsed.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (huntChars[i]) {
+        slot.appendChild(createCharElement(huntChars[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+
+  const sBan = document.getElementById(`global-surv-ban-${currentRound}`);
+  if (sBan) {
+    sBan.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (teamABans[i]) {
+        slot.appendChild(createCharElement(teamABans[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+  const hBan = document.getElementById(`global-hunt-ban-${currentRound}`);
+  if (hBan) {
+    hBan.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (teamBBans[i]) {
+        slot.appendChild(createCharElement(teamBBans[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+
+  // ピック画面の選択をすべて解除
+  ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
+    document.getElementById(id).querySelectorAll(".slot").forEach(slot => {
+      slot.innerHTML = "";
+    });
+  });
+
+  updateBanned();
+  document.getElementById("status-msg").textContent = `${currentRound} のグローバルBANに反映しました`;
+
+  // 次のラウンドへ自動移動
+  const rounds = ROUND_CONFIG[currentMode];
+  const idx = rounds.indexOf(currentRound);
+  if (idx >= 0 && idx < rounds.length - 1) {
+    setCurrentRound(rounds[idx + 1]);
+  }
+}
+
+function resetAll() {
+  document.querySelectorAll(".slot").forEach(s => s.innerHTML = "");
+  bannedNames.clear();
+  document.getElementById("status-msg").textContent = "";
+  renderPool();
+  checkCompleteButton();
+}
+
+async function saveAsImage() {
+  const btn = document.querySelector(".save-btn");
+  const original = btn.textContent;
+  btn.textContent = "保存中...";
+  btn.disabled = true;
+  try {
+    const canvas = await html2canvas(document.getElementById("capture-area"), {
+      backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim() || "#0d0d12",
+      scale: 2, useCORS: true, logging: false
+    });
+    const link = document.createElement("a");
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, "0");
+    link.download = `IDV_Pick_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    document.getElementById("status-msg").textContent = "画像保存に失敗しました";
+  } finally {
+    btn.textContent = original;
+    btn.disabled = false;
+  }
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  document.getElementById("theme-btn").textContent = isLight ? "ダークモードへ" : "ライトモードへ";
+  localStorage.setItem("idv-pick-theme", isLight ? "light" : "dark");
+}
+
+// ===== 初期化 =====
+if (localStorage.getItem("idv-pick-theme") === "light") {
+  document.body.classList.add("light");
+  document.getElementById("theme-btn").textContent = "ダークモードへ";
+}
+
+createSlotsInContainer(document.getElementById("teamA-surv"), 4, "pick", "survivor");
+createSlotsInContainer(document.getElementById("teamB-hunter"), 1, "pick", "hunter");
+
+buildRoundButtons();
+buildGlobalRounds();
+rebuildTeamBans();
+renderPool();
+checkCompleteButton();
+
+["teamA-surv", "teamB-hunter"].forEach(id => {
+  new MutationObserver(checkCompleteButton).observe(document.getElementById(id), { childList: true, subtree: true });
+});
+</script>
+</body>
+</html>
