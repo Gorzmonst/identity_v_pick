@@ -668,6 +668,15 @@
     height: 144px !important;
   }
 }
+  /* スマホ長押しで画像メニューが出るのを防止 */
+.char,
+.char img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none; /* iOSで特に重要 */
+  touch-action: none;
+}
 </style>
 </head>
 <body>
@@ -1272,6 +1281,12 @@ checkCompleteButton();
 
 ["teamA-surv", "teamB-hunter"].forEach(id => {
   new MutationObserver(checkCompleteButton).observe(document.getElementById(id), { childList: true, subtree: true });
+});
+  // 長押し時の画像コンテキストメニューを無効化
+document.addEventListener("contextmenu", e => {
+  if (e.target.closest(".char")) {
+    e.preventDefault();
+  }
 });
 </script>
 </body>
