@@ -667,6 +667,69 @@
   }
 }
 
+/* ===== スマホ強制スケール（50%相当）＋アイコンサイズ調整 ===== */
+@media screen and (max-width: 900px) {
+  body {
+    zoom: 0.5;
+    -moz-transform: scale(0.5);
+    -moz-transform-origin: 0 0;
+  }
+
+  /* 全体のアイコンを適度な大きさに（1行に収まるサイズ） */
+  .slot {
+    width: 72px !important;
+    height: 88px !important;
+  }
+  .char img {
+    width: 90% !important;
+    max-width: 64px !important;
+  }
+  .char .name {
+    font-size: 12px !important;
+    max-width: 68px !important;
+    margin-top: 2px !important;
+  }
+  .char.no-img .name {
+    font-size: 14px !important;
+  }
+  .clear-btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 20px !important;
+    top: -8px !important;
+    right: -8px !important;
+  }
+
+  .char-grid {
+    grid-template-columns: repeat(auto-fill, 90px) !important;
+    gap: 5px !important;
+  }
+  .char-grid .char {
+    width: 90px !important;
+    height: 110px !important;
+  }
+  .char-grid .char .name {
+    font-size: 14px !important;
+    max-width: 86px !important;
+  }
+  .char-grid .char.no-img .name {
+    font-size: 16px !important;
+  }
+
+  /* BO5時 */
+  body.bo5 .slot {
+    width: 64px !important;
+    height: 80px !important;
+  }
+  body.bo5 .char-grid {
+    grid-template-columns: repeat(auto-fill, 80px) !important;
+  }
+  body.bo5 .char-grid .char {
+    width: 80px !important;
+    height: 100px !important;
+  }
+}
+
 /* ===== スマホ縦向き専用：メニューを上部に移動 ===== */
 @media screen and (max-width: 900px) and (orientation: portrait) {
   body {
@@ -715,10 +778,7 @@
     justify-content: center;
   }
 
-  .complete-btn {
-    margin-top: 0;
-  }
-
+  .complete-btn,
   .reset-btn {
     margin-top: 0;
   }
@@ -733,8 +793,10 @@
     overflow: visible;
   }
 
+  /* グローバルBANは横並びを維持 */
   .global-row {
-    flex-direction: row; /* 横並びを維持 */
+    flex-direction: row !important;
+    gap: 8px;
   }
 }
 
