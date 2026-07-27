@@ -1144,9 +1144,9 @@ function rebuildTeamBans() {
   createSlotsInContainer(document.getElementById("teamA-bans"), counts.teamA, "ban", "hunter");
   const title = document.getElementById("teamA-ban-title");
   if (counts.teamA === 0) {
-    title.textContent = "BAN（このラウンドは不可）";
+    title.textContent = `BAN（このラウンドは不可）`;
   } else {
-    title.textContent = "BAN（ハンター ${counts.teamA}体）";
+    title.textContent = `BAN（ハンター ${counts.teamA}体）`;
   }
   createSlotsInContainer(document.getElementById("teamB-bans"), counts.teamB, "ban", "survivor");
   updateBanned();
