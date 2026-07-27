@@ -467,6 +467,146 @@
   body.bo5 .global-row {
     margin-bottom: 5px;
   }
+
+  /* ===== スマホ横向き・高さ不足時の強制コンパクト ===== */
+@media (max-height: 520px), (orientation: landscape) and (max-width: 950px) {
+  body {
+    padding: 3px;
+    gap: 4px;
+  }
+
+  .sidebar {
+    width: 100px;
+    padding: 5px 4px;
+    gap: 4px;
+  }
+  .sidebar h1 {
+    font-size: 0.72em;
+  }
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+    padding: 5px 3px;
+    font-size: 11px;
+  }
+  .side-label {
+    font-size: 0.65em;
+    margin-top: 2px;
+  }
+  .status-msg {
+    font-size: 10px;
+    min-height: 24px;
+  }
+
+  .main {
+    gap: 4px;
+  }
+
+  #capture-area {
+    padding: 2px;
+  }
+
+  .global-row {
+    gap: 4px;
+    margin-bottom: 3px;
+  }
+  .global-box {
+    padding: 2px 3px;
+  }
+  .global-title {
+    font-size: 0.6em;
+    margin-bottom: 2px;
+  }
+  .round-block {
+    margin-bottom: 1px;
+    padding: 1px;
+  }
+  .area-label {
+    font-size: 0.5em;
+  }
+  .slots {
+    gap: 2px;
+    min-height: 32px;
+  }
+
+  .slot {
+    width: 34px;
+    height: 42px;
+  }
+  .char img {
+    width: 78%;
+    max-width: 28px;
+  }
+  .char .name {
+    font-size: 5.8px;
+    max-width: 32px;
+    margin-top: 1px;
+  }
+  .char.no-img .name {
+    font-size: 7px;
+  }
+  .clear-btn {
+    width: 13px;
+    height: 13px;
+    font-size: 10px;
+    top: -4px;
+    right: -4px;
+  }
+
+  .teams {
+    gap: 4px;
+  }
+  .team {
+    padding: 3px 4px;
+  }
+  .team-name {
+    font-size: 0.85em;
+    margin-bottom: 2px;
+  }
+  .section-title {
+    font-size: 0.58em;
+    margin: 2px 0 1px;
+  }
+
+  .pool {
+    padding: 3px 4px;
+  }
+  .pool-controls {
+    margin-bottom: 3px;
+    gap: 3px;
+  }
+  .filter-btn {
+    padding: 3px 7px;
+    font-size: 11px;
+  }
+  .char-grid {
+    grid-template-columns: repeat(auto-fill, 42px);
+    gap: 2px;
+  }
+  .char-grid .char {
+    width: 42px;
+    height: 52px;
+  }
+  .char-grid .char .name {
+    font-size: 7px;
+    max-width: 40px;
+  }
+  .char-grid .char.no-img .name {
+    font-size: 8px;
+  }
+
+  /* BO5の時もさらに小さく */
+  body.bo5 .slot {
+    width: 30px;
+    height: 38px;
+  }
+  body.bo5 .char-grid {
+    grid-template-columns: repeat(auto-fill, 38px);
+  }
+  body.bo5 .char-grid .char {
+    width: 38px;
+    height: 48px;
+  }
+}
+  
 </style>
 </head>
 <body>
