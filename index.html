@@ -606,7 +606,14 @@
     height: 48px;
   }
 }
-  
+  /* ===== スマホ強制スケール（50%相当） ===== */
+@media screen and (max-width: 900px) {
+  body {
+    zoom: 0.5;                    /* Chrome / Edge / Android で最も自然 */
+    -moz-transform: scale(0.5);    /* Firefox用フォールバック */
+    -moz-transform-origin: 0 0;
+  }
+}
 </style>
 </head>
 <body>
