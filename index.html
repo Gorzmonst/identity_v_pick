@@ -323,8 +323,9 @@
     overflow: hidden;
   }
   .char img {
-    width: 34px;
-    height: 34px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: 3px;
     background: var(--char-noimg);
@@ -393,10 +394,6 @@
     height: 68px;
     border: 1px solid var(--slot-border);
   }
-  .char-grid .char img {
-    width: 40px;
-    height: 40px;
-  }
   .char-grid .char .name {
     font-size: 8.5px;
     max-width: 52px;
@@ -409,10 +406,6 @@
   body.bo5 .slot {
     width: 42px;
     height: 50px;
-  }
-  body.bo5 .char img {
-    width: 28px;
-    height: 28px;
   }
   body.bo5 .char .name {
     font-size: 6.5px;
@@ -427,10 +420,6 @@
   body.bo5 .char-grid .char {
     width: 48px;
     height: 58px;
-  }
-  body.bo5 .char-grid .char img {
-    width: 34px;
-    height: 34px;
   }
   body.bo5 .char-grid .char .name {
     font-size: 7.5px;
@@ -536,9 +525,9 @@
 
   <div class="pool">
     <div class="pool-controls">
-      <button class="filter-btn" onclick="filterPool('survivor')">サバイバー</button>
+      <button class="filter-btn active" onclick="filterPool('survivor')">サバイバー</button>
       <button class="filter-btn" onclick="filterPool('hunter')">ハンター</button>
-      <button class="filter-btn active" onclick="filterPool('all')">全て</button>
+      <button class="filter-btn" onclick="filterPool('all')">全て</button>
       <span style="margin-left:auto;color:var(--text-muted);font-size:0.75em;">BAN/使用中は薄暗く表示　×で枠を空に</span>
     </div>
     <div class="char-grid" id="char-pool"></div>
@@ -547,92 +536,94 @@
 
 <script>
 const characters = [
-  {name:"幸運児", type:"survivor", img:""},
-  {name:"庭師", type:"survivor", img:""},
-  {name:"弁護士", type:"survivor", img:""},
-  {name:"医師", type:"survivor", img:""},
-  {name:"泥棒", type:"survivor", img:""},
-  {name:"マジシャン", type:"survivor", img:""},
-  {name:"冒険家", type:"survivor", img:""},
-  {name:"傭兵", type:"survivor", img:""},
-  {name:"空軍", type:"survivor", img:""},
-  {name:"機械技師", type:"survivor", img:""},
-  {name:"オフェンス", type:"survivor", img:""},
-  {name:"心眼", type:"survivor", img:""},
-  {name:"祭司", type:"survivor", img:""},
-  {name:"調香師", type:"survivor", img:""},
-  {name:"カウボーイ", type:"survivor", img:""},
-  {name:"踊り子", type:"survivor", img:""},
-  {name:"占い師", type:"survivor", img:""},
-  {name:"納棺師", type:"survivor", img:""},
-  {name:"探鉱者", type:"survivor", img:""},
-  {name:"呪術師", type:"survivor", img:""},
-  {name:"野人", type:"survivor", img:""},
-  {name:"曲芸師", type:"survivor", img:""},
-  {name:"一等航海士", type:"survivor", img:""},
-  {name:"バーメイド", type:"survivor", img:""},
-  {name:"ポストマン", type:"survivor", img:""},
-  {name:"墓守", type:"survivor", img:""},
-  {name:"囚人", type:"survivor", img:""},
-  {name:"昆虫学者", type:"survivor", img:""},
-  {name:"画家", type:"survivor", img:""},
-  {name:"バッツマン", type:"survivor", img:""},
-  {name:"玩具職人", type:"survivor", img:""},
-  {name:"患者", type:"survivor", img:""},
-  {name:"心理学者", type:"survivor", img:""},
-  {name:"小説家", type:"survivor", img:""},
-  {name:"少女", type:"survivor", img:""},
-  {name:"教授", type:"survivor", img:""},
-  {name:"骨董商", type:"survivor", img:""},
-  {name:"作曲家", type:"survivor", img:""},
-  {name:"記者", type:"survivor", img:""},
-  {name:"航空エンジニア", type:"survivor", img:""},
-  {name:"応援団", type:"survivor", img:""},
-  {name:"人形師", type:"survivor", img:""},
-  {name:"火災調査員", type:"survivor", img:""},
-  {name:"レディ・ファウロ", type:"survivor", img:""},
-  {name:"騎士", type:"survivor", img:""},
-  {name:"気象学者", type:"survivor", img:""},
-  {name:"弓使い", type:"survivor", img:""},
-  {name:"脱出マスター", type:"survivor", img:""},
-  {name:"幻灯師", type:"survivor", img:""},
-  {name:"闘牛士", type:"survivor", img:""},
-  {name:"マイムアーティスト", type:"survivor", img:""},
+  {name:"庭師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ed0150f9-e1f7-4d3e-9428-c08b253a6316.png"},
+  {name:"弁護士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/1270f6b8-18d5-4dc5-9351-89e5fa71ac35.png"},
+  {name:"医師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/a3f1d900-e3cd-4e6b-a90b-eb43c9dd2028.png"},
+  {name:"泥棒", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ca2d83e8-5db7-48ff-b37a-93fc8892ec92.png"},
+  {name:"マジシャン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/14013394-0e57-4e05-9285-2941947ab130.png"},
+  {name:"冒険家", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/4f9d0387-b76a-463e-9f65-b945f09411d1.png"},
+  {name:"傭兵", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2044a9e1-bb83-42b1-bcae-2a936993ba4b.png"},
+  {name:"空軍", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0e0f71f8-5a1b-470c-92ee-a6284b2f692c.png"},
+  {name:"祭司", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2b83d106-d8c5-4044-9fb7-a73da81ba88f.png"},
+  {name:"機械技師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/b632b106-9927-47a2-b51c-8a71e7221d9f.png"},
+  {name:"オフェンス", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/df12466f-2a72-4993-ba4c-569cc18d25c5.png"},
+  {name:"心眼", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/3016ecc5-a511-475d-a71e-8673f4eb05d6.png"},
+  {name:"調香師", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/80027721-84b3-4a4b-a37f-65c9544f638d.png"},
+  {name:"カウボーイ", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/abb961f5-df1f-4910-a84d-7aa862d29307.png"},
+  {name:"踊り子", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0917da74-16f3-4fd1-8587-34c6eb9bdc3b.png"},
+  {name:"占い師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/441c7049-65c8-4bf9-983d-b9c768a0c6c7.png"},
+  {name:"納棺師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2ea34c7b-5d0e-4adc-9594-4eee266db57d.png"},
+  {name:"探鉱者", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/588ef287-7357-4604-adcd-fe0487038dae.png"},
+  {name:"呪術師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/38938c20-7008-4753-bc7b-fc18cc14d806.png"},
+  {name:"野人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/10ef9a42-b1d3-44db-a707-6598f4a7f55f.png"},
+  {name:"曲芸師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/55e29549-3311-4b24-9676-a7e915e4c08e.png"},
+  {name:"一等航海士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0e70772a-5324-4663-8fc4-fc0c597206f0.png"},
+  {name:"バーメイド", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/454fd2c1-df90-4612-8cc4-da7643f3d9bd.png"},
+  {name:"ポストマン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/5cf4fd28-241e-4754-a0df-0491a83cae01.png"},
+  {name:"墓守", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/6960a563-ce7d-4e45-bc10-774b06fe180a.png"},
+  {name:"囚人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/208f4b4c-03c6-4d12-ab00-c1fc1e13037f.png"},
+  {name:"昆虫学者", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/741cab16-7a25-4c1d-8e5c-9f7f4d296189.png"},
+  {name:"画家", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/926f8543-5a3d-46a9-8d7f-71c19132fcf1.png"},
+  {name:"バッツマン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/14f5e23b-28c5-4800-9e54-ec2bb5331f4c.png"},
+  {name:"玩具職人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/13cb7a1c-3ed8-47c2-9c9c-386073c539fb.png"},
+  {name:"患者", type:"survivor", img:"https://r.res.easebar.com/pic/20211012/493b5733-1feb-44e2-a62e-98d052079908.png"},
+  {name:"心理学者", type:"survivor", img:"https://r.res.easebar.com/pic/20211012/47e56f50-baf6-4478-b751-78609377cc66.png"},
+  {name:"小説家", type:"survivor", img:"https://r.res.easebar.com/pic/20211227/e427402f-118e-4257-9c73-cdd4d93d5989.png"},
+  {name:"少女", type:"survivor", img:"https://r.res.easebar.com/pic/20211227/e6a7caf5-e788-4c83-818e-9f40c98580b1.png"},
+  {name:"泣きピエロ", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/d887703e-6061-4142-aa54-cafac7f4758d.png"},
+  {name:"教授", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/ee787a6d-adfb-4725-af34-ff26dfd52cd5.png"},
+  {name:"骨董商", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/70033254-d887-43a7-b16d-7823e5a2f9ee.png"},
+  {name:"作曲家", type:"survivor", img:"https://r.res.easebar.com/pic/20221201/34f5b368-d736-412d-af52-8c3fa3499390.png"},
+  {name:"記者", type:"survivor", img:"https://r.res.easebar.com/pic/20230621/cf00966b-446e-4c63-8da6-62fea26d1e59.png"},
+  {name:"航空エンジニア", type:"survivor", img:"https://r.res.easebar.com/pic/20230719/294a1bec-a8d3-4f87-99a6-bb27f5ff0989.png"},
+  {name:"応援団", type:"survivor", img:"https://r.res.easebar.com/pic/20230830/1ef2acaf-bf0b-4a9d-9fa5-93c56f304041.png"},
+  {name:"人形師", type:"survivor", img:"https://r.res.easebar.com/pic/20240118/db8e6091-86fd-4515-a02e-697e873069e8.png"},
+  {name:"火災調査員", type:"survivor", img:"https://r.res.easebar.com/pic/20240410/930c0b1b-4d72-493c-881d-d322882ba5fa.png"},
+  {name:"レディ・ファウロ", type:"survivor", img:"https://r.res.easebar.com/pic/20240603/4565ba16-bd59-4d8e-99e9-90a7fbc351c5.png"},
+  {name:"騎士", type:"survivor", img:"https://r.res.easebar.com/pic/20241017/ac50d4b2-c54f-4d8d-baae-442a2442417b.png"},
+  {name:"気象学者", type:"survivor", img:"https://r.res.easebar.com/pic/20250114/2ce23333-a69a-423d-bedf-932da3e6c5f6.png"},
+  {name:"弓使い", type:"survivor", img:"https://r.res.easebar.com/pic/20250217/fdfb89ca-ffa1-4945-b5a8-c523433a243e.png"},
+  {name:"脱出マスター", type:"survivor", img:"https://r.res.easebar.com/pic/20250522/b7c5a3b3-6a0d-4b93-bf4a-e9a880cc318f.png"},
+  {name:"幻灯師", type:"survivor", img:"https://r.res.easebar.com/pic/20250922/ec7ba79a-7d33-4970-9667-1cf13771931f.png"},
+  {name:"闘牛士", type:"survivor", img:"https://r.res.easebar.com/pic/20260123/90c5e223-d8d3-42b2-8a20-c95a2a431804.png"},
+  {name:"マイムアーティスト", type:"survivor", img:"https://r.res.easebar.com/pic/20260605/b2f56ce0-cfe5-45b6-9802-02e2c8ec3fef.png"},
+  {name:"幸運児", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/92d9dfcb-1469-440b-89d4-17058642f8b8.png"},
 
-  {name:"復讐者", type:"hunter", img:""},
-  {name:"道化師", type:"hunter", img:""},
-  {name:"リッパー", type:"hunter", img:""},
-  {name:"断罪狩人", type:"hunter", img:""},
-  {name:"結魂者", type:"hunter", img:""},
-  {name:"芸者", type:"hunter", img:""},
-  {name:"黄衣の王", type:"hunter", img:""},
-  {name:"写真家", type:"hunter", img:""},
-  {name:"狂眼", type:"hunter", img:""},
-  {name:"夢の魔女", type:"hunter", img:""},
-  {name:"泣き虫", type:"hunter", img:""},
-  {name:"魔トカゲ", type:"hunter", img:""},
-  {name:"血の女王", type:"hunter", img:""},
-  {name:"ガードNo.26", type:"hunter", img:""},
-  {name:"使徒", type:"hunter", img:""},
-  {name:"ヴァイオリニスト", type:"hunter", img:""},
-  {name:"彫刻家", type:"hunter", img:""},
-  {name:"アンデッド", type:"hunter", img:""},
-  {name:"破輪", type:"hunter", img:""},
-  {name:"漁師", type:"hunter", img:""},
-  {name:"蝋人形師", type:"hunter", img:""},
-  {name:"悪夢", type:"hunter", img:""},
-  {name:"書記官", type:"hunter", img:""},
-  {name:"隠者", type:"hunter", img:""},
-  {name:"夜の番人", type:"hunter", img:""},
-  {name:"オペラ歌手", type:"hunter", img:""},
-  {name:"フールズ・ゴールド", type:"hunter", img:""},
-  {name:"時空の影", type:"hunter", img:""},
-  {name:"足萎えの羊", type:"hunter", img:""},
-  {name:"フラバルー", type:"hunter", img:""},
-  {name:"雑貨商", type:"hunter", img:""},
-  {name:"ビリヤードプレイヤー", type:"hunter", img:""},
-  {name:"女王蜂", type:"hunter", img:""},
-  {name:"歯医者", type:"hunter", img:""}
+  {name:"復讐者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3d0ad699-d7d1-4435-b748-767de0e163ab.png"},
+  {name:"道化師", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/af80f4b6-ff5d-4d96-a4e5-b2d0bffe583e.png"},
+  {name:"断罪狩人", type:"hunter", img:"https://r.res.easebar.com/pic/20210722/13828e4f-59b4-4f8b-9301-ccbd0972e1f3.png"},
+  {name:"リッパー", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/5497873e-1110-4db2-9c78-6eed7ebe317a.png"},
+  {name:"結魂者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/6f01b221-db26-4e5b-8358-091e117b02c7.png"},
+  {name:"芸者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/d4955168-3a5b-4255-8db3-49684838f40b.png"},
+  {name:"白黒無常", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2213f5c6-95dc-4a95-9e81-25c3953456d8.png"},
+  {name:"写真家", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/9094b776-8560-43ac-ab70-8403d9529ac1.png"},
+  {name:"狂眼", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3ef0468e-e39f-4396-808b-0b5b55be3218.png"},
+  {name:"黄衣の王", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/5e1b1cfb-f700-4955-82ee-5360b62cff37.png"},
+  {name:"夢の魔女", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/abb970f8-e246-41f7-a60b-ee43b540f176.png"},
+  {name:"泣き虫", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/e1f886dd-353a-4390-a98e-0d46acc43503.png"},
+  {name:"魔トカゲ", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2a3f91d5-d8b3-48f8-b33f-53e3fb9d4f6a.png"},
+  {name:"血の女王", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/81ebbfc4-8d89-4e97-a536-58ab709f475d.png"},
+  {name:"ガードNo.26", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2fb9acc0-8c03-4ce4-88ff-72b6f9db1c02.png"},
+  {name:"使徒", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/a3e00872-8c52-4de9-83c9-a24e4f434e39.png"},
+  {name:"ヴァイオリニスト", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/654154a2-7daf-46e6-9454-8b32deb1cbb5.png"},
+  {name:"彫刻師", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/55f167cc-691d-44c3-8fc7-f0371481ca32.png"},
+  {name:"アンデッド", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/db3890b1-4fbe-4661-8936-8e67a4d901c9.png"},
+  {name:"破輪", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3f716772-20ab-4e07-a4e3-99170b4d839d.png"},
+  {name:"漁師", type:"hunter", img:"https://r.res.easebar.com/pic/20210623/2b556fb2-0e81-4156-a459-c90420a8c006.png"},
+  {name:"蝋人形師", type:"hunter", img:"https://r.res.easebar.com/pic/20211012/34c8ba29-4b43-4318-8ff8-aa2e92b3e980.png"},
+  {name:"悪夢", type:"hunter", img:"https://r.res.easebar.com/pic/20211227/06838cc9-6897-4411-a2bb-d257fdb31f87.png"},
+  {name:"書記官", type:"hunter", img:"https://r.res.easebar.com/pic/20220805/d119dc32-2c94-46e7-b58f-27eca9d141d2.png"},
+  {name:"隠者", type:"hunter", img:"https://r.res.easebar.com/pic/20220815/7fdb7a3b-70e4-4a5b-b5e6-1ba6ea5f16d7.png"},
+  {name:"夜の番人", type:"hunter", img:"https://r.res.easebar.com/pic/20230621/da78f6cb-0842-4a23-9073-cb568766fad4.png"},
+  {name:"オペラ歌手", type:"hunter", img:"https://r.res.easebar.com/pic/20230621/439a25b4-61b2-4d58-a1df-e7ad0c39838b.png"},
+  {name:"フールズ・ゴールド", type:"hunter", img:"https://r.res.easebar.com/pic/20231016/04355008-7b72-4985-88ea-d00ffed29959.png"},
+  {name:"時空の影", type:"hunter", img:"https://r.res.easebar.com/pic/20240301/60f7d024-e2bf-4693-b566-178c93400e1a.png"},
+  {name:"足萎えの羊", type:"hunter", img:"https://r.res.easebar.com/pic/20240806/ecae5d21-7b21-4cdd-b2f0-68f0ba5ea51d.png"},
+  {name:"フラバルー", type:"hunter", img:"https://r.res.easebar.com/pic/20241203/128aed4f-265e-41a2-b1d4-836569a45a12.png"},
+  {name:"雑貨商", type:"hunter", img:"https://r.res.easebar.com/pic/20250408/dd6fc95f-b8d6-4227-a66a-0064d950fe8c.png"},
+  {name:"ビリヤードプレイヤー", type:"hunter", img:"https://r.res.easebar.com/pic/20250813/d98337fb-43c9-486e-b0c1-c84377966432.png"},
+  {name:"女王蜂", type:"hunter", img:"https://r.res.easebar.com/pic/20251111/32a36239-8f28-44ae-9071-cf9bd816a5d0.png"},
+  {name:"歯医者", type:"hunter", img:"https://r.res.easebar.com/pic/20260518/6915da4e-28c3-4c1b-8329-b81bd4d37aea.png"}
 ];
 
 const bannedNames = new Set();
@@ -1074,7 +1065,7 @@ createSlotsInContainer(document.getElementById("teamB-hunter"), 1, "pick", "hunt
 buildRoundButtons();
 buildGlobalRounds();
 rebuildTeamBans();
-renderPool();
+renderPool('survivor');
 checkCompleteButton();
 
 ["teamA-surv", "teamB-hunter"].forEach(id => {
