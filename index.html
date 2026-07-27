@@ -64,7 +64,7 @@
     display: flex;
     gap: 10px;
     padding: 8px;
-    overflow: auto; /* スクロールロック解除 */
+    overflow: auto;
     transition: background 0.2s, color 0.2s;
   }
 
@@ -593,7 +593,6 @@
     font-size: 8px;
   }
 
-  /* BO5の時もさらに小さく */
   body.bo5 .slot {
     width: 30px;
     height: 38px;
@@ -615,7 +614,6 @@
     -moz-transform-origin: 0 0;
   }
 
-  /* キャラアイコンを約3倍に */
   .slot {
     width: 102px !important;
     height: 126px !important;
@@ -656,7 +654,6 @@
     font-size: 24px !important;
   }
 
-  /* BO5時も同様に拡大 */
   body.bo5 .slot {
     width: 90px !important;
     height: 114px !important;
@@ -670,7 +667,78 @@
   }
 }
 
-/* スマホ長押しで画像メニューが出るのを防止（調整版） */
+/* ===== スマホ縦向き専用：メニューを上部に移動 ===== */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+  body {
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    padding: 6px;
+    gap: 8px;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    gap: 6px;
+    overflow: visible;
+  }
+
+  .sidebar h1 {
+    width: 100%;
+    font-size: 1.1em;
+    margin-bottom: 4px;
+  }
+
+  .side-label {
+    display: none;
+  }
+
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+    width: auto;
+    min-width: 70px;
+    flex: 1 1 auto;
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+
+  #round-buttons {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 5px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .complete-btn {
+    margin-top: 0;
+  }
+
+  .reset-btn {
+    margin-top: 0;
+  }
+
+  .status-msg {
+    width: 100%;
+    min-height: 28px;
+  }
+
+  .main {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .global-row {
+    flex-direction: row; /* 横並びを維持 */
+  }
+}
+
+/* スマホ長押しで画像メニューが出るのを防止 */
 .char,
 .char img {
   -webkit-user-select: none;
@@ -981,7 +1049,6 @@ function buildGlobalRounds() {
   ROUND_CONFIG[currentMode].forEach(r => {
     const counts = getBanCounts(r);
 
-    // サバイバー側
     const sBlock = document.createElement("div");
     sBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
     sBlock.dataset.round = r;
@@ -1013,7 +1080,6 @@ function buildGlobalRounds() {
     createSlotsInContainer(sUsedSlots, 4, "pick", "survivor");
     createSlotsInContainer(sBanSlots, counts.teamA, "ban", "hunter");
 
-    // ハンター側
     const hBlock = document.createElement("div");
     hBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
     hBlock.dataset.round = r;
@@ -1208,7 +1274,6 @@ function completePick() {
     });
   }
 
-  // ピック画面の選択をすべて解除
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
     document.getElementById(id).querySelectorAll(".slot").forEach(slot => {
       slot.innerHTML = "";
@@ -1218,7 +1283,6 @@ function completePick() {
   updateBanned();
   document.getElementById("status-msg").textContent = `${currentRound} のグローバルBANに反映しました`;
 
-  // 次のラウンドへ自動移動
   const rounds = ROUND_CONFIG[currentMode];
   const idx = rounds.indexOf(currentRound);
   if (idx >= 0 && idx < rounds.length - 1) {
