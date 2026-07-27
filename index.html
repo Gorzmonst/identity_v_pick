@@ -68,7 +68,6 @@
     transition: background 0.2s, color 0.2s;
   }
 
-  /* ===== 左サイドバー ===== */
   .sidebar {
     width: 132px;
     flex-shrink: 0;
@@ -107,10 +106,7 @@
     background: var(--btn-bg);
     color: var(--btn-text);
   }
-  .theme-btn {
-    font-size: 12px;
-    margin-bottom: 2px;
-  }
+  .theme-btn { font-size: 12px; margin-bottom: 2px; }
   .mode-btn.active { background: var(--gold); color: #111; border-color: var(--gold); }
   .round-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
   .round-btn.ot.active { background: var(--red); border-color: var(--red); }
@@ -151,7 +147,6 @@
   }
   body.light .status-msg { color: #1a7a3a; }
 
-  /* ===== メインエリア ===== */
   .main {
     flex: 1;
     min-width: 0;
@@ -403,7 +398,6 @@
     font-size: 10px;
   }
 
-  /* ===== BO5 コンパクトモード ===== */
   body.bo5 .slot {
     width: 42px;
     height: 50px;
@@ -468,13 +462,11 @@
     margin-bottom: 5px;
   }
 
-  /* ===== スマホ横向き・高さ不足時の強制コンパクト ===== */
 @media (max-height: 520px), (orientation: landscape) and (max-width: 950px) {
   body {
     padding: 3px;
     gap: 4px;
   }
-
   .sidebar {
     width: 100px;
     padding: 5px 4px;
@@ -495,15 +487,12 @@
     font-size: 10px;
     min-height: 24px;
   }
-
   .main {
     gap: 4px;
   }
-
   #capture-area {
     padding: 2px;
   }
-
   .global-row {
     gap: 4px;
     margin-bottom: 3px;
@@ -526,7 +515,6 @@
     gap: 2px;
     min-height: 32px;
   }
-
   .slot {
     width: 34px;
     height: 42px;
@@ -550,7 +538,6 @@
     top: -4px;
     right: -4px;
   }
-
   .teams {
     gap: 4px;
   }
@@ -565,7 +552,6 @@
     font-size: 0.58em;
     margin: 2px 0 1px;
   }
-
   .pool {
     padding: 3px 4px;
   }
@@ -592,7 +578,6 @@
   .char-grid .char.no-img .name {
     font-size: 8px;
   }
-
   body.bo5 .slot {
     width: 30px;
     height: 38px;
@@ -606,7 +591,7 @@
   }
 }
 
-/* ===== スマホ強制スケール（50%相当）＋キャラアイコン拡大 ===== */
+/* スマホ強制スケール＋アイコンサイズ調整（1行に収まるサイズ） */
 @media screen and (max-width: 900px) {
   body {
     zoom: 0.5;
@@ -614,68 +599,6 @@
     -moz-transform-origin: 0 0;
   }
 
-  .slot {
-    width: 102px !important;
-    height: 126px !important;
-  }
-  .char img {
-    width: 90% !important;
-    max-width: 90px !important;
-  }
-  .char .name {
-    font-size: 17px !important;
-    max-width: 96px !important;
-    margin-top: 3px !important;
-  }
-  .char.no-img .name {
-    font-size: 21px !important;
-  }
-  .clear-btn {
-    width: 39px !important;
-    height: 39px !important;
-    font-size: 30px !important;
-    top: -12px !important;
-    right: -12px !important;
-  }
-
-  .char-grid {
-    grid-template-columns: repeat(auto-fill, 126px) !important;
-    gap: 6px !important;
-  }
-  .char-grid .char {
-    width: 126px !important;
-    height: 156px !important;
-  }
-  .char-grid .char .name {
-    font-size: 21px !important;
-    max-width: 120px !important;
-  }
-  .char-grid .char.no-img .name {
-    font-size: 24px !important;
-  }
-
-  body.bo5 .slot {
-    width: 90px !important;
-    height: 114px !important;
-  }
-  body.bo5 .char-grid {
-    grid-template-columns: repeat(auto-fill, 114px) !important;
-  }
-  body.bo5 .char-grid .char {
-    width: 114px !important;
-    height: 144px !important;
-  }
-}
-
-/* ===== スマホ強制スケール（50%相当）＋アイコンサイズ調整 ===== */
-@media screen and (max-width: 900px) {
-  body {
-    zoom: 0.5;
-    -moz-transform: scale(0.5);
-    -moz-transform-origin: 0 0;
-  }
-
-  /* 全体のアイコンを適度な大きさに（1行に収まるサイズ） */
   .slot {
     width: 72px !important;
     height: 88px !important;
@@ -716,7 +639,6 @@
     font-size: 16px !important;
   }
 
-  /* BO5時 */
   body.bo5 .slot {
     width: 64px !important;
     height: 80px !important;
@@ -730,7 +652,7 @@
   }
 }
 
-/* ===== スマホ縦向き専用：メニューを上部に移動 ===== */
+/* スマホ縦向き：メニューを上部に移動＋タイトル1行化 */
 @media screen and (max-width: 900px) and (orientation: portrait) {
   body {
     flex-direction: column;
@@ -753,8 +675,12 @@
 
   .sidebar h1 {
     width: 100%;
-    font-size: 1.1em;
+    font-size: 1.05em;
     margin-bottom: 4px;
+    white-space: nowrap;
+  }
+  .sidebar h1 br {
+    display: none; /* 改行を消して1行にする */
   }
 
   .side-label {
@@ -793,14 +719,12 @@
     overflow: visible;
   }
 
-  /* グローバルBANは横並びを維持 */
   .global-row {
     flex-direction: row !important;
     gap: 8px;
   }
 }
 
-/* スマホ長押しで画像メニューが出るのを防止 */
 .char,
 .char img {
   -webkit-user-select: none;
@@ -811,7 +735,6 @@
 </head>
 <body>
 
-<!-- 左サイドバー -->
 <div class="sidebar">
   <h1>第五人格<br>大会ピック<br>シミュレーター</h1>
 
@@ -832,7 +755,6 @@
   <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
 </div>
 
-<!-- メイン -->
 <div class="main">
   <div id="capture-area">
     <div class="global-row">
@@ -977,17 +899,78 @@ const ROUND_CONFIG = {
   BO5: ["R1", "R2", "R3", "R4", "R5", "延長"]
 };
 
+const STORAGE_KEY = "idv-pick-state";
+
 function getBanCounts(round) {
   if (round === "R1") return { teamA: 0, teamB: 4 };
   if (round === "R2") return { teamA: 1, teamB: 4 };
   return { teamA: 2, teamB: 4 };
 }
 
+function getAllSlotIds() {
+  const ids = ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"];
+  ROUND_CONFIG[currentMode].forEach(r => {
+    ids.push(`global-surv-used-${r}`);
+    ids.push(`global-surv-ban-${r}`);
+    ids.push(`global-hunt-used-${r}`);
+    ids.push(`global-hunt-ban-${r}`);
+  });
+  return ids;
+}
+
+function saveState() {
+  const state = {
+    mode: currentMode,
+    round: currentRound,
+    teamAName: document.querySelector(".team-a .team-name").textContent,
+    teamBName: document.querySelector(".team-b .team-name").textContent,
+    slots: {}
+  };
+  getAllSlotIds().forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      state.slots[id] = [...el.querySelectorAll(".char")].map(c => c.dataset.name);
+    }
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    if (state.mode) setMode(state.mode);
+    if (state.round) setCurrentRound(state.round);
+    if (state.teamAName) document.querySelector(".team-a .team-name").textContent = state.teamAName;
+    if (state.teamBName) document.querySelector(".team-b .team-name").textContent = state.teamBName;
+    if (state.slots) {
+      Object.entries(state.slots).forEach(([id, names]) => {
+        const container = document.getElementById(id);
+        if (!container) return;
+        const slots = container.querySelectorAll(".slot");
+        names.forEach((name, i) => {
+          if (i >= slots.length) return;
+          const charData = characters.find(c => c.name === name);
+          if (charData) {
+            slots[i].innerHTML = "";
+            slots[i].appendChild(createCharElement(charData));
+            addClearButton(slots[i]);
+          }
+        });
+      });
+    }
+    updateBanned();
+    checkCompleteButton();
+  } catch (e) {
+    console.warn("ピック情報の復元に失敗", e);
+  }
+}
+
 function addClearButton(slot) {
   const existing = slot.querySelector(".clear-btn");
   if (existing) existing.remove();
   if (!slot.querySelector(".char")) return;
-
   const btn = document.createElement("button");
   btn.className = "clear-btn";
   btn.innerHTML = "×";
@@ -997,6 +980,7 @@ function addClearButton(slot) {
     slot.innerHTML = "";
     updateBanned();
     checkCompleteButton();
+    saveState();
   };
   slot.appendChild(btn);
 }
@@ -1009,7 +993,6 @@ function createCharElement(data, isPool = false) {
   div.dataset.name = data.name;
   div.dataset.type = data.type;
   div.dataset.img = data.img || "";
-
   if (data.img) {
     const img = document.createElement("img");
     img.src = data.img;
@@ -1028,7 +1011,6 @@ function createCharElement(data, isPool = false) {
   nameSpan.className = "name";
   nameSpan.textContent = data.name;
   div.appendChild(nameSpan);
-
   div.addEventListener("dragstart", e => {
     e.dataTransfer.setData("text/plain", JSON.stringify({
       name: data.name, type: data.type, img: data.img || ""
@@ -1045,7 +1027,6 @@ function createCharElement(data, isPool = false) {
 
 function makeDroppable(slot, allowedType) {
   slot.dataset.allowed = allowedType;
-
   slot.addEventListener("dragover", e => {
     e.preventDefault();
     slot.classList.add("over");
@@ -1058,37 +1039,31 @@ function makeDroppable(slot, allowedType) {
     e.preventDefault();
     slot.classList.remove("over");
     slot.classList.remove("reject");
-
     let data;
     try {
       data = JSON.parse(e.dataTransfer.getData("text/plain"));
     } catch { return; }
-
     if (data.type !== allowedType) {
       slot.classList.add("reject");
       setTimeout(() => slot.classList.remove("reject"), 450);
       return;
     }
-
     const isMovingFromSlot = draggedChar && draggedChar.closest(".slot");
     if (bannedNames.has(data.name) && !isMovingFromSlot) {
       slot.classList.add("reject");
       setTimeout(() => slot.classList.remove("reject"), 450);
       return;
     }
-
     const sourceSlot = draggedChar ? draggedChar.closest(".slot") : null;
-
     slot.innerHTML = "";
     slot.appendChild(createCharElement(data));
     addClearButton(slot);
-
     if (sourceSlot && sourceSlot !== slot) {
       sourceSlot.innerHTML = "";
     }
-
     updateBanned();
     checkCompleteButton();
+    saveState();
   });
 }
 
@@ -1107,17 +1082,13 @@ function buildGlobalRounds() {
   const huntC = document.getElementById("global-hunt-rounds");
   survC.innerHTML = "";
   huntC.innerHTML = "";
-
   ROUND_CONFIG[currentMode].forEach(r => {
     const counts = getBanCounts(r);
-
     const sBlock = document.createElement("div");
     sBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
     sBlock.dataset.round = r;
-    
     const sContent = document.createElement("div");
     sContent.className = "round-content";
-    
     const sUsed = document.createElement("div");
     sUsed.className = "used-area";
     sUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
@@ -1125,7 +1096,6 @@ function buildGlobalRounds() {
     sUsedSlots.className = "slots";
     sUsedSlots.id = `global-surv-used-${r}`;
     sUsed.appendChild(sUsedSlots);
-    
     const sBan = document.createElement("div");
     sBan.className = "ban-area";
     sBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
@@ -1133,22 +1103,18 @@ function buildGlobalRounds() {
     sBanSlots.className = "slots";
     sBanSlots.id = `global-surv-ban-${r}`;
     sBan.appendChild(sBanSlots);
-    
     sContent.appendChild(sUsed);
     sContent.appendChild(sBan);
     sBlock.appendChild(sContent);
     survC.appendChild(sBlock);
-    
     createSlotsInContainer(sUsedSlots, 4, "pick", "survivor");
     createSlotsInContainer(sBanSlots, counts.teamA, "ban", "hunter");
 
     const hBlock = document.createElement("div");
     hBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
     hBlock.dataset.round = r;
-    
     const hContent = document.createElement("div");
     hContent.className = "round-content";
-    
     const hUsed = document.createElement("div");
     hUsed.className = "used-area";
     hUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
@@ -1156,7 +1122,6 @@ function buildGlobalRounds() {
     hUsedSlots.className = "slots";
     hUsedSlots.id = `global-hunt-used-${r}`;
     hUsed.appendChild(hUsedSlots);
-    
     const hBan = document.createElement("div");
     hBan.className = "ban-area";
     hBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
@@ -1164,31 +1129,25 @@ function buildGlobalRounds() {
     hBanSlots.className = "slots";
     hBanSlots.id = `global-hunt-ban-${r}`;
     hBan.appendChild(hBanSlots);
-    
     hContent.appendChild(hUsed);
     hContent.appendChild(hBan);
     hBlock.appendChild(hContent);
     huntC.appendChild(hBlock);
-    
     createSlotsInContainer(hUsedSlots, 1, "pick", "hunter");
     createSlotsInContainer(hBanSlots, counts.teamB, "ban", "survivor");
   });
-
   updateBanned();
 }
 
 function rebuildTeamBans() {
   const counts = getBanCounts(currentRound);
-  
   createSlotsInContainer(document.getElementById("teamA-bans"), counts.teamA, "ban", "hunter");
-  
   const title = document.getElementById("teamA-ban-title");
   if (counts.teamA === 0) {
     title.textContent = "個別BAN（このラウンドは不可）";
   } else {
     title.textContent = `個別BAN（ハンター ${counts.teamA}体）`;
   }
-  
   createSlotsInContainer(document.getElementById("teamB-bans"), counts.teamB, "ban", "survivor");
   updateBanned();
 }
@@ -1198,7 +1157,6 @@ function buildRoundButtons() {
   container.innerHTML = "";
   const rounds = ROUND_CONFIG[currentMode];
   if (!rounds.includes(currentRound)) currentRound = rounds[0];
-
   rounds.forEach(r => {
     const btn = document.createElement("button");
     btn.className = "round-btn" + (r === "延長" ? " ot" : "") + (r === currentRound ? " active" : "");
@@ -1216,6 +1174,7 @@ function setMode(mode) {
   buildRoundButtons();
   buildGlobalRounds();
   rebuildTeamBans();
+  saveState();
 }
 
 function setCurrentRound(r) {
@@ -1225,6 +1184,7 @@ function setCurrentRound(r) {
     b.classList.toggle("active-round", b.dataset.round === r);
   });
   rebuildTeamBans();
+  saveState();
 }
 
 function renderPool(filter = "all") {
@@ -1244,19 +1204,16 @@ function filterPool(type) {
 
 function updateBanned() {
   bannedNames.clear();
-
   ROUND_CONFIG[currentMode].forEach(r => {
     [`global-surv-used-${r}`, `global-surv-ban-${r}`, `global-hunt-used-${r}`, `global-hunt-ban-${r}`].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
     });
   });
-
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
   });
-
   const active = document.querySelector(".filter-btn.active");
   let f = "all";
   if (active?.textContent.includes("サバイバー")) f = "survivor";
@@ -1284,7 +1241,6 @@ function completePick() {
   const teamBBans = [...document.getElementById("teamB-bans").querySelectorAll(".char")].map(c => ({
     name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
   }));
-
   if (survChars.length !== 4 || huntChars.length !== 1) {
     document.getElementById("status-msg").textContent = "サバイバー4体とハンター1体をすべてピックしてください";
     return;
@@ -1293,7 +1249,6 @@ function completePick() {
     document.getElementById("status-msg").textContent = "役職が正しくありません";
     return;
   }
-
   const sUsed = document.getElementById(`global-surv-used-${currentRound}`);
   const hUsed = document.getElementById(`global-hunt-used-${currentRound}`);
   if (sUsed) {
@@ -1314,7 +1269,6 @@ function completePick() {
       }
     });
   }
-
   const sBan = document.getElementById(`global-surv-ban-${currentRound}`);
   if (sBan) {
     sBan.querySelectorAll(".slot").forEach((slot, i) => {
@@ -1335,21 +1289,19 @@ function completePick() {
       }
     });
   }
-
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
     document.getElementById(id).querySelectorAll(".slot").forEach(slot => {
       slot.innerHTML = "";
     });
   });
-
   updateBanned();
   document.getElementById("status-msg").textContent = `${currentRound} のグローバルBANに反映しました`;
-
   const rounds = ROUND_CONFIG[currentMode];
   const idx = rounds.indexOf(currentRound);
   if (idx >= 0 && idx < rounds.length - 1) {
     setCurrentRound(rounds[idx + 1]);
   }
+  saveState();
 }
 
 function resetAll() {
@@ -1358,6 +1310,8 @@ function resetAll() {
   document.getElementById("status-msg").textContent = "";
   renderPool();
   checkCompleteButton();
+  localStorage.removeItem(STORAGE_KEY);
+  saveState();
 }
 
 async function saveAsImage() {
@@ -1390,7 +1344,7 @@ function toggleTheme() {
   localStorage.setItem("idv-pick-theme", isLight ? "light" : "dark");
 }
 
-// ===== 初期化 =====
+// 初期化
 if (localStorage.getItem("idv-pick-theme") === "light") {
   document.body.classList.add("light");
   document.getElementById("theme-btn").textContent = "ダークモードへ";
@@ -1409,12 +1363,17 @@ checkCompleteButton();
   new MutationObserver(checkCompleteButton).observe(document.getElementById(id), { childList: true, subtree: true });
 });
 
-// 長押し時の画像コンテキストメニューを無効化
+document.querySelectorAll(".team-name").forEach(el => {
+  el.addEventListener("input", saveState);
+});
+
 document.addEventListener("contextmenu", e => {
   if (e.target.closest(".char")) {
     e.preventDefault();
   }
 });
+
+loadState();
 </script>
 </body>
 </html>
