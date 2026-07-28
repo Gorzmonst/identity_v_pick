@@ -235,6 +235,64 @@
   .used-area .slots { justify-content: flex-start; }
   .ban-area .slots { justify-content: flex-end; }
 
+  /* ===== マップ表示エリア（メニューとサバイバーの間） ===== */
+  .maps-row {
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+  }
+  .maps-title {
+    font-size: 0.78em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .maps-display {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .map-card {
+    width: 110px;
+    background: var(--slot-bg);
+    border: 2px solid var(--slot-border);
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+    transition: 0.15s;
+  }
+  .map-card.active-map {
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(201,162,39,0.4);
+  }
+  .map-card img {
+    width: 100%;
+    height: 62px;
+    object-fit: cover;
+    background: var(--char-noimg);
+    display: block;
+  }
+  .map-card .map-name {
+    font-size: 0.72em;
+    padding: 4px 2px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .map-card .map-round {
+    font-size: 0.62em;
+    color: var(--text-dim);
+    padding-bottom: 3px;
+  }
+  .map-card.empty .map-name {
+    color: var(--text-dim);
+    padding: 20px 4px;
+  }
+
   .teams {
     display: flex;
     gap: 8px;
@@ -486,6 +544,12 @@
   body.bo5 .global-row {
     margin-bottom: 5px;
   }
+  body.bo5 .map-card {
+    width: 95px;
+  }
+  body.bo5 .map-card img {
+    height: 52px;
+  }
 
 @media (max-height: 520px), (orientation: landscape) and (max-width: 950px) {
   body {
@@ -614,9 +678,15 @@
     width: 38px;
     height: 48px;
   }
+  .map-card {
+    width: 85px;
+  }
+  .map-card img {
+    height: 48px;
+  }
 }
 
-/* スマホ強制スケール＋アイコンサイズ調整（1行に収まるサイズ） */
+/* スマホ強制スケール＋アイコンサイズ調整 */
 @media screen and (max-width: 900px) {
   body {
     zoom: 0.5;
@@ -675,9 +745,16 @@
     width: 80px !important;
     height: 100px !important;
   }
+
+  .map-card {
+    width: 140px !important;
+  }
+  .map-card img {
+    height: 80px !important;
+  }
 }
 
-/* スマホ縦向き：メニューを上部に移動＋タイトル1行化 */
+/* スマホ縦向き */
 @media screen and (max-width: 900px) and (orientation: portrait) {
   body {
     flex-direction: column;
@@ -791,6 +868,12 @@
         <div class="global-title">グローバルBAN（ハンター）</div>
         <div id="global-hunt-rounds"></div>
       </div>
+    </div>
+
+    <!-- マップ表示エリア（メニューとサバイバーの間） -->
+    <div class="maps-row">
+      <div class="maps-title">使用マップ</div>
+      <div class="maps-display" id="maps-display"></div>
     </div>
 
     <div class="teams">
@@ -915,15 +998,15 @@ const characters = [
 ];
 
 const maps = [
-  "軍需工場",
-  "赤の教会",
-  "聖心病院",
-  "湖景村",
-  "月の河公園",
-  "レオの思い出",
-  "永眠町",
-  "中華街",
-  "罪の森"
+  {name: "軍需工場", img: ""},
+  {name: "赤の教会", img: ""},
+  {name: "聖心病院", img: ""},
+  {name: "湖景村", img: ""},
+  {name: "月の河公園", img: ""},
+  {name: "レオの思い出", img: ""},
+  {name: "永眠町", img: ""},
+  {name: "中華街", img: ""},
+  {name: "罪の森", img: ""}
 ];
 
 const bannedNames = new Set();
@@ -1009,6 +1092,7 @@ function loadState() {
         if (sel) sel.value = val || "";
       });
       updateUsedMaps();
+      renderMapsDisplay();
     }
     updateBanned();
     checkCompleteButton();
@@ -1157,19 +1241,20 @@ function buildGlobalRounds() {
     sContent.appendChild(sBan);
     sBlock.appendChild(sContent);
 
-    // マップ選択
+    // マップ選択ドロップダウン
     const mapSelect = document.createElement("select");
     mapSelect.className = "map-select";
     mapSelect.id = `map-select-${r}`;
     mapSelect.innerHTML = `<option value="">マップ未選択</option>`;
     maps.forEach(m => {
       const opt = document.createElement("option");
-      opt.value = m;
-      opt.textContent = m;
+      opt.value = m.name;
+      opt.textContent = m.name;
       mapSelect.appendChild(opt);
     });
     mapSelect.addEventListener("change", () => {
       updateUsedMaps();
+      renderMapsDisplay();
       saveState();
     });
     sBlock.appendChild(mapSelect);
@@ -1206,6 +1291,46 @@ function buildGlobalRounds() {
   });
   updateBanned();
   updateUsedMaps();
+  renderMapsDisplay();
+}
+
+function renderMapsDisplay() {
+  const container = document.getElementById("maps-display");
+  container.innerHTML = "";
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    const mapName = sel ? sel.value : "";
+    const mapData = maps.find(m => m.name === mapName);
+
+    const card = document.createElement("div");
+    card.className = "map-card" + (mapName ? "" : " empty") + (r === currentRound ? " active-map" : "");
+    
+    if (mapName && mapData) {
+      if (mapData.img) {
+        const img = document.createElement("img");
+        img.src = mapData.img;
+        img.alt = mapName;
+        img.onerror = () => { img.style.display = "none"; };
+        card.appendChild(img);
+      }
+      const nameDiv = document.createElement("div");
+      nameDiv.className = "map-name";
+      nameDiv.textContent = mapName;
+      card.appendChild(nameDiv);
+    } else {
+      const nameDiv = document.createElement("div");
+      nameDiv.className = "map-name";
+      nameDiv.textContent = "未選択";
+      card.appendChild(nameDiv);
+    }
+    
+    const roundDiv = document.createElement("div");
+    roundDiv.className = "map-round";
+    roundDiv.textContent = r;
+    card.appendChild(roundDiv);
+    
+    container.appendChild(card);
+  });
 }
 
 function rebuildTeamBans() {
@@ -1244,6 +1369,7 @@ function setMode(mode) {
   buildGlobalRounds();
   rebuildTeamBans();
   updateUsedMaps();
+  renderMapsDisplay();
   saveState();
 }
 
@@ -1255,6 +1381,7 @@ function setCurrentRound(r) {
   });
   rebuildTeamBans();
   updateUsedMaps();
+  renderMapsDisplay();
   saveState();
 }
 
@@ -1434,6 +1561,7 @@ function resetAll() {
 
   renderPool("survivor");
   updateUsedMaps();
+  renderMapsDisplay();
   checkCompleteButton();
   localStorage.removeItem(STORAGE_KEY);
   saveState();
