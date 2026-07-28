@@ -95,7 +95,7 @@
     text-align: center;
     margin-top: 4px;
   }
-  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn, .restriction-btn {
     width: 100%;
     padding: 7px 4px;
     border-radius: 5px;
@@ -110,6 +110,8 @@
   .mode-btn.active { background: var(--gold); color: #111; border-color: var(--gold); }
   .round-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
   .round-btn.ot.active { background: var(--red); border-color: var(--red); }
+  .restriction-btn.pick { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .restriction-btn.free { background: var(--green); color: #fff; border-color: var(--green); }
   .complete-btn {
     background: linear-gradient(135deg, var(--green), #1a6b3a);
     border: none;
@@ -687,7 +689,7 @@
   body { padding: 3px; gap: 4px; }
   .sidebar { width: 100px; padding: 5px 4px; gap: 4px; }
   .sidebar h1 { font-size: 0.72em; }
-  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn, .restriction-btn {
     padding: 5px 3px; font-size: 11px;
   }
   .side-label { font-size: 0.65em; margin-top: 2px; }
@@ -777,7 +779,7 @@
   }
   .sidebar h1 br { display: none; }
   .side-label { display: none; }
-  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn, .restriction-btn {
     width: auto;
     min-width: 70px;
     flex: 1 1 auto;
@@ -818,6 +820,8 @@
   <div class="side-label">モード</div>
   <button class="mode-btn active" id="btn-bo3" onclick="setMode('BO3')">BO3</button>
   <button class="mode-btn" id="btn-bo5" onclick="setMode('BO5')">BO5</button>
+  <div class="side-label">選択制限</div>
+  <button class="restriction-btn pick" id="restriction-btn" onclick="toggleRestriction()">ピックモード</button>
   <div class="side-label">現在ラウンド</div>
   <div id="round-buttons" style="display:flex;flex-direction:column;gap:4px;"></div>
   <button class="complete-btn" id="complete-btn" onclick="completePick()" disabled>
@@ -830,7 +834,6 @@
 
 <div class="main">
   <div id="capture-area">
-    <!-- グローバルBAN + 左に全マップ -->
     <div class="global-wrapper">
       <div class="global-maps-panel">
         <div class="global-maps-title">使用マップ</div>
@@ -848,7 +851,6 @@
       </div>
     </div>
 
-    <!-- ピック部分 + 左に現在マップ1つ -->
     <div class="teams-wrapper">
       <div class="current-map-panel">
         <div class="current-map-title">現在のマップ</div>
@@ -1005,10 +1007,11 @@ const maps = [
 
 const bannedNames = new Set();
 const usedMaps = new Set();
-let mapSelections = {};          // { R1: "軍需工場", ... }
+let mapSelections = {};
 let selectingRound = null;
 let currentMode = "BO3";
 let currentRound = "R1";
+let isFreeMode = false;          // false = ピックモード, true = フリーモード
 let draggedChar = null;
 
 const ROUND_CONFIG = {
@@ -1039,6 +1042,7 @@ function saveState() {
   const state = {
     mode: currentMode,
     round: currentRound,
+    freeMode: isFreeMode,
     teamAName: document.querySelector(".team-a .team-name").textContent,
     teamBName: document.querySelector(".team-b .team-name").textContent,
     slots: {},
@@ -1058,6 +1062,10 @@ function loadState() {
     const state = JSON.parse(raw);
     if (state.mode) setMode(state.mode);
     if (state.round) setCurrentRound(state.round);
+    if (typeof state.freeMode === "boolean") {
+      isFreeMode = state.freeMode;
+      updateRestrictionButton();
+    }
     if (state.teamAName) document.querySelector(".team-a .team-name").textContent = state.teamAName;
     if (state.teamBName) document.querySelector(".team-b .team-name").textContent = state.teamBName;
     if (state.slots) {
@@ -1109,7 +1117,9 @@ function addClearButton(slot) {
 function createCharElement(data, isPool = false) {
   const div = document.createElement("div");
   div.className = `char ${data.type}` + (data.img ? "" : " no-img");
-  if (isPool && bannedNames.has(data.name)) div.classList.add("banned");
+  if (isPool && bannedNames.has(data.name) && !isFreeMode) {
+    div.classList.add("banned");
+  }
   div.draggable = true;
   div.dataset.name = data.name;
   div.dataset.type = data.type;
@@ -1170,7 +1180,8 @@ function makeDroppable(slot, allowedType) {
       return;
     }
     const isMovingFromSlot = draggedChar && draggedChar.closest(".slot");
-    if (bannedNames.has(data.name) && !isMovingFromSlot) {
+    // フリーモードのときはロック無視
+    if (bannedNames.has(data.name) && !isMovingFromSlot && !isFreeMode) {
       slot.classList.add("reject");
       setTimeout(() => slot.classList.remove("reject"), 450);
       return;
@@ -1265,7 +1276,6 @@ function buildGlobalRounds() {
 }
 
 function renderMapsDisplay() {
-  // 1. グローバル左（全ラウンド）
   const globalContainer = document.getElementById("global-maps-display");
   globalContainer.innerHTML = "";
   ROUND_CONFIG[currentMode].forEach(r => {
@@ -1298,7 +1308,7 @@ function renderMapsDisplay() {
     globalContainer.appendChild(card);
   });
 
-  // 2. ピック左（現在ラウンド）
+  // 現在のマップ
   const currentContainer = document.getElementById("current-map-display");
   currentContainer.innerHTML = "";
   const mapName = mapSelections[currentRound] || "";
@@ -1355,7 +1365,8 @@ function openMapModal(round) {
     const item = document.createElement("div");
     item.className = "map-modal-item";
     if (mapSelections[round] === m.name) item.classList.add("selected");
-    if (usedMaps.has(m.name) && mapSelections[round] !== m.name) {
+    // フリーモードのときはロック無視
+    if (usedMaps.has(m.name) && mapSelections[round] !== m.name && !isFreeMode) {
       item.classList.add("disabled");
     }
 
@@ -1393,7 +1404,6 @@ function clearCurrentMap() {
   saveState();
 }
 
-// モーダル外クリックで閉じる
 document.getElementById("map-modal").addEventListener("click", e => {
   if (e.target.id === "map-modal") closeMapModal();
 });
@@ -1443,7 +1453,29 @@ function setCurrentRound(r) {
   rebuildTeamBans();
   updateUsedMaps();
   renderMapsDisplay();
+  // ラウンド変更時にBAN状態を再計算（特にBO5延長の特例のため）
+  updateBanned();
   saveState();
+}
+
+function toggleRestriction() {
+  isFreeMode = !isFreeMode;
+  updateRestrictionButton();
+  updateBanned();          // グレーアウト状態を即座に更新
+  saveState();
+}
+
+function updateRestrictionButton() {
+  const btn = document.getElementById("restriction-btn");
+  if (isFreeMode) {
+    btn.textContent = "フリーモード";
+    btn.classList.remove("pick");
+    btn.classList.add("free");
+  } else {
+    btn.textContent = "ピックモード";
+    btn.classList.remove("free");
+    btn.classList.add("pick");
+  }
 }
 
 function renderPool(filter = "all") {
@@ -1466,21 +1498,32 @@ function filterPool(type) {
 
 function updateBanned() {
   bannedNames.clear();
+
+  // グローバル使用枠を追加（BO5の延長戦時はR5の使用をロック対象から除外）
   ROUND_CONFIG[currentMode].forEach(r => {
+    // BO5 + 現在が延長 + 対象がR5 の場合はスキップ（表示は残すがロックしない）
+    if (currentMode === "BO5" && currentRound === "延長" && r === "R5") {
+      return;
+    }
     [`global-surv-used-${r}`, `global-hunt-used-${r}`].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
     });
   });
+
+  // 現在のチーム枠
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
   });
+
+  // 現在ラウンドのグローバルBAN枠
   const r = currentRound;
   [`global-surv-ban-${r}`, `global-hunt-ban-${r}`].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
   });
+
   const active = document.querySelector(".filter-btn.active");
   let f = "all";
   if (active?.textContent.includes("サバイバー")) f = "survivor";
@@ -1634,6 +1677,7 @@ buildGlobalRounds();
 rebuildTeamBans();
 renderPool('survivor');
 checkCompleteButton();
+updateRestrictionButton();
 
 ["teamA-surv", "teamB-hunter"].forEach(id => {
   new MutationObserver(checkCompleteButton).observe(document.getElementById(id), { childList: true, subtree: true });
