@@ -163,10 +163,40 @@
     flex-shrink: 0;
   }
 
+  /* ===== グローバルBAN + 左マップ ===== */
+  .global-wrapper {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .global-maps-panel {
+    width: 108px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  .global-maps-title {
+    font-size: 0.7em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  .global-maps-display {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+
   .global-row {
     display: flex;
     gap: 8px;
-    margin-bottom: 7px;
+    flex: 1;
+    min-width: 0;
   }
   .global-box {
     flex: 1;
@@ -235,68 +265,58 @@
   .used-area .slots { justify-content: flex-start; }
   .ban-area .slots { justify-content: flex-end; }
 
-  /* ===== マップ表示（サバイバーの左） ===== */
+  /* ===== ピック部分 + 現在マップ1つ ===== */
   .teams-wrapper {
     display: flex;
     gap: 8px;
   }
-  .maps-panel {
-    width: 120px;
+  .current-map-panel {
+    width: 128px;
     flex-shrink: 0;
     background: var(--panel);
-    border: 2px solid var(--border2);
+    border: 2px solid var(--gold);
     border-radius: 6px;
-    padding: 6px 5px;
+    padding: 8px 6px;
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
-  .maps-title {
-    font-size: 0.74em;
-    color: var(--text-muted);
+  .current-map-title {
+    font-size: 0.72em;
+    color: var(--gold);
     text-align: center;
     margin-bottom: 6px;
+    font-weight: bold;
   }
-  .maps-display {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
-  }
-  .map-card {
+  .current-map-card {
+    width: 100%;
     background: var(--slot-bg);
     border: 2px solid var(--slot-border);
-    border-radius: 5px;
+    border-radius: 6px;
     overflow: hidden;
     text-align: center;
-    transition: 0.15s;
   }
-  .map-card.active-map {
-    border-color: var(--gold);
-    box-shadow: 0 0 6px rgba(201,162,39,0.45);
-  }
-  .map-card img {
+  .current-map-card img {
     width: 100%;
-    height: 58px;
+    height: 90px;
     object-fit: cover;
     background: var(--char-noimg);
     display: block;
   }
-  .map-card .map-name {
+  .current-map-card .map-name {
+    font-size: 0.85em;
+    padding: 6px 4px;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+  .current-map-card.empty .map-name {
+    color: var(--text-dim);
+    padding: 36px 4px;
+  }
+  .current-map-round {
     font-size: 0.7em;
-    padding: 3px 2px 1px;
-    line-height: 1.15;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .map-card .map-round {
-    font-size: 0.6em;
-    color: var(--text-dim);
-    padding-bottom: 3px;
-  }
-  .map-card.empty .map-name {
-    color: var(--text-dim);
-    padding: 18px 4px;
+    color: var(--text-muted);
+    margin-top: 5px;
   }
 
   .teams {
@@ -484,9 +504,41 @@
   .round-block.active-round.ot .map-select {
     border-color: var(--red);
   }
-  body.bo5 .map-select {
-    font-size: 0.6em;
-    padding: 2px 3px;
+
+  /* 小さなマップカード（グローバル左用） */
+  .map-card-sm {
+    background: var(--slot-bg);
+    border: 2px solid var(--slot-border);
+    border-radius: 4px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .map-card-sm.active-map {
+    border-color: var(--gold);
+  }
+  .map-card-sm img {
+    width: 100%;
+    height: 40px;
+    object-fit: cover;
+    background: var(--char-noimg);
+    display: block;
+  }
+  .map-card-sm .map-name {
+    font-size: 0.65em;
+    padding: 2px 1px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .map-card-sm .map-round {
+    font-size: 0.58em;
+    color: var(--text-dim);
+    padding-bottom: 2px;
+  }
+  .map-card-sm.empty .map-name {
+    color: var(--text-dim);
+    padding: 14px 2px;
   }
 
   body.bo5 .slot {
@@ -549,220 +601,82 @@
     font-size: 0.92em;
     margin-bottom: 2px;
   }
-  body.bo5 .global-row {
-    margin-bottom: 5px;
+  body.bo5 .global-maps-panel {
+    width: 95px;
   }
-  body.bo5 .maps-panel {
-    width: 105px;
+  body.bo5 .current-map-panel {
+    width: 110px;
   }
-  body.bo5 .map-card img {
-    height: 48px;
+  body.bo5 .current-map-card img {
+    height: 75px;
   }
 
 @media (max-height: 520px), (orientation: landscape) and (max-width: 950px) {
-  body {
-    padding: 3px;
-    gap: 4px;
-  }
-  .sidebar {
-    width: 100px;
-    padding: 5px 4px;
-    gap: 4px;
-  }
-  .sidebar h1 {
-    font-size: 0.72em;
-  }
+  body { padding: 3px; gap: 4px; }
+  .sidebar { width: 100px; padding: 5px 4px; gap: 4px; }
+  .sidebar h1 { font-size: 0.72em; }
   .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
-    padding: 5px 3px;
-    font-size: 11px;
+    padding: 5px 3px; font-size: 11px;
   }
-  .side-label {
-    font-size: 0.65em;
-    margin-top: 2px;
-  }
-  .status-msg {
-    font-size: 10px;
-    min-height: 24px;
-  }
-  .main {
-    gap: 4px;
-  }
-  #capture-area {
-    padding: 2px;
-  }
-  .global-row {
-    gap: 4px;
-    margin-bottom: 3px;
-  }
-  .global-box {
-    padding: 2px 3px;
-  }
-  .global-title {
-    font-size: 0.6em;
-    margin-bottom: 2px;
-  }
-  .round-block {
-    margin-bottom: 1px;
-    padding: 1px;
-  }
-  .area-label {
-    font-size: 0.5em;
-  }
-  .slots {
-    gap: 2px;
-    min-height: 32px;
-  }
-  .slot {
-    width: 34px;
-    height: 42px;
-  }
-  .char img {
-    width: 78%;
-    max-width: 28px;
-  }
-  .char .name {
-    font-size: 5.8px;
-    max-width: 32px;
-    margin-top: 1px;
-  }
-  .char.no-img .name {
-    font-size: 7px;
-  }
-  .clear-btn {
-    width: 13px;
-    height: 13px;
-    font-size: 10px;
-    top: -4px;
-    right: -4px;
-  }
-  .teams {
-    gap: 4px;
-  }
-  .team {
-    padding: 3px 4px;
-  }
-  .team-name {
-    font-size: 0.85em;
-    margin-bottom: 2px;
-  }
-  .section-title {
-    font-size: 0.58em;
-    margin: 2px 0 1px;
-  }
-  .pool {
-    padding: 3px 4px;
-  }
-  .pool-controls {
-    margin-bottom: 3px;
-    gap: 3px;
-  }
-  .filter-btn {
-    padding: 3px 7px;
-    font-size: 11px;
-  }
-  .char-grid {
-    grid-template-columns: repeat(auto-fill, 42px);
-    gap: 2px;
-  }
-  .char-grid .char {
-    width: 42px;
-    height: 52px;
-  }
-  .char-grid .char .name {
-    font-size: 7px;
-    max-width: 40px;
-  }
-  .char-grid .char.no-img .name {
-    font-size: 8px;
-  }
-  body.bo5 .slot {
-    width: 30px;
-    height: 38px;
-  }
-  body.bo5 .char-grid {
-    grid-template-columns: repeat(auto-fill, 38px);
-  }
-  body.bo5 .char-grid .char {
-    width: 38px;
-    height: 48px;
-  }
-  .maps-panel {
-    width: 90px;
-  }
-  .map-card img {
-    height: 42px;
-  }
+  .side-label { font-size: 0.65em; margin-top: 2px; }
+  .status-msg { font-size: 10px; min-height: 24px; }
+  .main { gap: 4px; }
+  #capture-area { padding: 2px; }
+  .global-wrapper { gap: 4px; margin-bottom: 4px; }
+  .global-maps-panel { width: 85px; }
+  .global-row { gap: 4px; }
+  .global-box { padding: 2px 3px; }
+  .global-title { font-size: 0.6em; margin-bottom: 2px; }
+  .round-block { margin-bottom: 1px; padding: 1px; }
+  .area-label { font-size: 0.5em; }
+  .slots { gap: 2px; min-height: 32px; }
+  .slot { width: 34px; height: 42px; }
+  .char img { width: 78%; max-width: 28px; }
+  .char .name { font-size: 5.8px; max-width: 32px; margin-top: 1px; }
+  .char.no-img .name { font-size: 7px; }
+  .clear-btn { width: 13px; height: 13px; font-size: 10px; top: -4px; right: -4px; }
+  .teams-wrapper { gap: 4px; }
+  .current-map-panel { width: 95px; }
+  .current-map-card img { height: 60px; }
+  .teams { gap: 4px; }
+  .team { padding: 3px 4px; }
+  .team-name { font-size: 0.85em; margin-bottom: 2px; }
+  .section-title { font-size: 0.58em; margin: 2px 0 1px; }
+  .pool { padding: 3px 4px; }
+  .pool-controls { margin-bottom: 3px; gap: 3px; }
+  .filter-btn { padding: 3px 7px; font-size: 11px; }
+  .char-grid { grid-template-columns: repeat(auto-fill, 42px); gap: 2px; }
+  .char-grid .char { width: 42px; height: 52px; }
+  .char-grid .char .name { font-size: 7px; max-width: 40px; }
+  .char-grid .char.no-img .name { font-size: 8px; }
+  body.bo5 .slot { width: 30px; height: 38px; }
+  body.bo5 .char-grid { grid-template-columns: repeat(auto-fill, 38px); }
+  body.bo5 .char-grid .char { width: 38px; height: 48px; }
 }
 
-/* スマホ強制スケール */
 @media screen and (max-width: 900px) {
   body {
     zoom: 0.5;
     -moz-transform: scale(0.5);
     -moz-transform-origin: 0 0;
   }
-
-  .slot {
-    width: 72px !important;
-    height: 88px !important;
-  }
-  .char img {
-    width: 90% !important;
-    max-width: 64px !important;
-  }
-  .char .name {
-    font-size: 12px !important;
-    max-width: 68px !important;
-    margin-top: 2px !important;
-  }
-  .char.no-img .name {
-    font-size: 14px !important;
-  }
-  .clear-btn {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 20px !important;
-    top: -8px !important;
-    right: -8px !important;
-  }
-
-  .char-grid {
-    grid-template-columns: repeat(auto-fill, 90px) !important;
-    gap: 5px !important;
-  }
-  .char-grid .char {
-    width: 90px !important;
-    height: 110px !important;
-  }
-  .char-grid .char .name {
-    font-size: 14px !important;
-    max-width: 86px !important;
-  }
-  .char-grid .char.no-img .name {
-    font-size: 16px !important;
-  }
-
-  body.bo5 .slot {
-    width: 64px !important;
-    height: 80px !important;
-  }
-  body.bo5 .char-grid {
-    grid-template-columns: repeat(auto-fill, 80px) !important;
-  }
-  body.bo5 .char-grid .char {
-    width: 80px !important;
-    height: 100px !important;
-  }
-
-  .maps-panel {
-    width: 160px !important;
-  }
-  .map-card img {
-    height: 80px !important;
-  }
+  .slot { width: 72px !important; height: 88px !important; }
+  .char img { width: 90% !important; max-width: 64px !important; }
+  .char .name { font-size: 12px !important; max-width: 68px !important; margin-top: 2px !important; }
+  .char.no-img .name { font-size: 14px !important; }
+  .clear-btn { width: 28px !important; height: 28px !important; font-size: 20px !important; top: -8px !important; right: -8px !important; }
+  .char-grid { grid-template-columns: repeat(auto-fill, 90px) !important; gap: 5px !important; }
+  .char-grid .char { width: 90px !important; height: 110px !important; }
+  .char-grid .char .name { font-size: 14px !important; max-width: 86px !important; }
+  .char-grid .char.no-img .name { font-size: 16px !important; }
+  body.bo5 .slot { width: 64px !important; height: 80px !important; }
+  body.bo5 .char-grid { grid-template-columns: repeat(auto-fill, 80px) !important; }
+  body.bo5 .char-grid .char { width: 80px !important; height: 100px !important; }
+  .global-maps-panel { width: 140px !important; }
+  .current-map-panel { width: 160px !important; }
+  .current-map-card img { height: 110px !important; }
 }
 
-/* スマホ縦向き */
 @media screen and (max-width: 900px) and (orientation: portrait) {
   body {
     flex-direction: column;
@@ -771,7 +685,6 @@
     padding: 6px;
     gap: 8px;
   }
-
   .sidebar {
     width: 100%;
     flex-direction: row;
@@ -782,21 +695,14 @@
     gap: 6px;
     overflow: visible;
   }
-
   .sidebar h1 {
     width: 100%;
     font-size: 1.05em;
     margin-bottom: 4px;
     white-space: nowrap;
   }
-  .sidebar h1 br {
-    display: none;
-  }
-
-  .side-label {
-    display: none;
-  }
-
+  .sidebar h1 br { display: none; }
+  .side-label { display: none; }
   .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
     width: auto;
     min-width: 70px;
@@ -804,7 +710,6 @@
     padding: 8px 6px;
     font-size: 13px;
   }
-
   #round-buttons {
     display: flex !important;
     flex-direction: row !important;
@@ -813,45 +718,18 @@
     width: 100%;
     justify-content: center;
   }
-
-  .complete-btn,
-  .reset-btn {
-    margin-top: 0;
-  }
-
-  .status-msg {
-    width: 100%;
-    min-height: 28px;
-  }
-
-  .main {
-    width: 100%;
-    overflow: visible;
-  }
-
-  .global-row {
-    flex-direction: row !important;
-    gap: 8px;
-  }
-
-  .teams-wrapper {
-    flex-direction: column;
-  }
-  .maps-panel {
-    width: 100% !important;
-  }
-  .maps-display {
-    flex-direction: row !important;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .map-card {
-    width: 140px;
-  }
+  .complete-btn, .reset-btn { margin-top: 0; }
+  .status-msg { width: 100%; min-height: 28px; }
+  .main { width: 100%; overflow: visible; }
+  .global-wrapper { flex-direction: column; }
+  .global-maps-panel { width: 100% !important; }
+  .global-maps-display { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .map-card-sm { width: 110px; }
+  .teams-wrapper { flex-direction: column; }
+  .current-map-panel { width: 100% !important; }
 }
 
-.char,
-.char img {
+.char, .char img {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -862,16 +740,12 @@
 
 <div class="sidebar">
   <h1>第五人格<br>大会ピック<br>シミュレーター</h1>
-
   <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">ライトモードへ</button>
-
   <div class="side-label">モード</div>
   <button class="mode-btn active" id="btn-bo3" onclick="setMode('BO3')">BO3</button>
   <button class="mode-btn" id="btn-bo5" onclick="setMode('BO5')">BO5</button>
-
   <div class="side-label">現在ラウンド</div>
   <div id="round-buttons" style="display:flex;flex-direction:column;gap:4px;"></div>
-
   <button class="complete-btn" id="complete-btn" onclick="completePick()" disabled>
     ピック完了<br>→グローバルBANへ
   </button>
@@ -882,24 +756,31 @@
 
 <div class="main">
   <div id="capture-area">
-    <div class="global-row">
-      <div class="global-box surv">
-        <div class="global-title">グローバルBAN（サバイバー）</div>
-        <div id="global-surv-rounds"></div>
+    <!-- グローバルBAN + 左に全マップ -->
+    <div class="global-wrapper">
+      <div class="global-maps-panel">
+        <div class="global-maps-title">使用マップ</div>
+        <div class="global-maps-display" id="global-maps-display"></div>
       </div>
-      <div class="global-box hunt">
-        <div class="global-title">グローバルBAN（ハンター）</div>
-        <div id="global-hunt-rounds"></div>
+      <div class="global-row">
+        <div class="global-box surv">
+          <div class="global-title">グローバルBAN（サバイバー）</div>
+          <div id="global-surv-rounds"></div>
+        </div>
+        <div class="global-box hunt">
+          <div class="global-title">グローバルBAN（ハンター）</div>
+          <div id="global-hunt-rounds"></div>
+        </div>
       </div>
     </div>
 
-    <!-- ここがサバイバーの左 -->
+    <!-- ピック部分 + 左に現在マップ1つ -->
     <div class="teams-wrapper">
-      <div class="maps-panel">
-        <div class="maps-title">使用マップ</div>
-        <div class="maps-display" id="maps-display"></div>
+      <div class="current-map-panel">
+        <div class="current-map-title">現在のマップ</div>
+        <div id="current-map-display"></div>
+        <div class="current-map-round" id="current-map-round-label"></div>
       </div>
-
       <div class="teams">
         <div class="team team-a">
           <div class="team-name" contenteditable="true">TEAM A（サバイバー）※テキスト入力可</div>
@@ -931,7 +812,6 @@
 </div>
 
 <script>
-/* ここから下のJSは前回と同じなので省略せず全文を出します（長いですがコピペ用） */
 const characters = [
   {name:"庭師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ed0150f9-e1f7-4d3e-9428-c08b253a6316.png"},
   {name:"弁護士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/1270f6b8-18d5-4dc5-9351-89e5fa71ac35.png"},
@@ -1022,7 +902,7 @@ const characters = [
   {name:"女王蜂", type:"hunter", img:"https://r.res.easebar.com/pic/20251111/32a36239-8f28-44ae-9071-cf9bd816a5d0.png"},
   {name:"歯医者", type:"hunter", img:"https://r.res.easebar.com/pic/20260518/6915da4e-28c3-4c1b-8329-b81bd4d37aea.png"}
 ];
-
+  
 const maps = [
   {name: "軍需工場", img: ""},
   {name: "赤の教会", img: ""},
@@ -1076,9 +956,7 @@ function saveState() {
   };
   getAllSlotIds().forEach(id => {
     const el = document.getElementById(id);
-    if (el) {
-      state.slots[id] = [...el.querySelectorAll(".char")].map(c => c.dataset.name);
-    }
+    if (el) state.slots[id] = [...el.querySelectorAll(".char")].map(c => c.dataset.name);
   });
   ROUND_CONFIG[currentMode].forEach(r => {
     const sel = document.getElementById(`map-select-${r}`);
@@ -1117,9 +995,9 @@ function loadState() {
         const sel = document.getElementById(`map-select-${r}`);
         if (sel) sel.value = val || "";
       });
-      updateUsedMaps();
-      renderMapsDisplay();
     }
+    updateUsedMaps();
+    renderMapsDisplay();
     updateBanned();
     checkCompleteButton();
   } catch (e) {
@@ -1218,9 +1096,7 @@ function makeDroppable(slot, allowedType) {
     slot.innerHTML = "";
     slot.appendChild(createCharElement(data));
     addClearButton(slot);
-    if (sourceSlot && sourceSlot !== slot) {
-      sourceSlot.innerHTML = "";
-    }
+    if (sourceSlot && sourceSlot !== slot) sourceSlot.innerHTML = "";
     updateBanned();
     checkCompleteButton();
     saveState();
@@ -1244,6 +1120,8 @@ function buildGlobalRounds() {
   huntC.innerHTML = "";
   ROUND_CONFIG[currentMode].forEach(r => {
     const counts = getBanCounts(r);
+
+    // サバイバー側
     const sBlock = document.createElement("div");
     sBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
     sBlock.dataset.round = r;
@@ -1267,6 +1145,7 @@ function buildGlobalRounds() {
     sContent.appendChild(sBan);
     sBlock.appendChild(sContent);
 
+    // マップ選択
     const mapSelect = document.createElement("select");
     mapSelect.className = "map-select";
     mapSelect.id = `map-select-${r}`;
@@ -1288,6 +1167,7 @@ function buildGlobalRounds() {
     createSlotsInContainer(sUsedSlots, 4, "pick", "survivor");
     createSlotsInContainer(sBanSlots, counts.teamA, "ban", "hunter");
 
+    // ハンター側
     const hBlock = document.createElement("div");
     hBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
     hBlock.dataset.round = r;
@@ -1320,53 +1200,68 @@ function buildGlobalRounds() {
 }
 
 function renderMapsDisplay() {
-  const container = document.getElementById("maps-display");
-  container.innerHTML = "";
+  // 1. グローバル左（全ラウンド）
+  const globalContainer = document.getElementById("global-maps-display");
+  globalContainer.innerHTML = "";
   ROUND_CONFIG[currentMode].forEach(r => {
     const sel = document.getElementById(`map-select-${r}`);
     const mapName = sel ? sel.value : "";
     const mapData = maps.find(m => m.name === mapName);
 
     const card = document.createElement("div");
-    card.className = "map-card" + (mapName ? "" : " empty") + (r === currentRound ? " active-map" : "");
-    
-    if (mapName && mapData) {
-      if (mapData.img) {
-        const img = document.createElement("img");
-        img.src = mapData.img;
-        img.alt = mapName;
-        img.onerror = () => { img.style.display = "none"; };
-        card.appendChild(img);
-      }
-      const nameDiv = document.createElement("div");
-      nameDiv.className = "map-name";
-      nameDiv.textContent = mapName;
-      card.appendChild(nameDiv);
-    } else {
-      const nameDiv = document.createElement("div");
-      nameDiv.className = "map-name";
-      nameDiv.textContent = "未選択";
-      card.appendChild(nameDiv);
+    card.className = "map-card-sm" + (mapName ? "" : " empty") + (r === currentRound ? " active-map" : "");
+
+    if (mapName && mapData && mapData.img) {
+      const img = document.createElement("img");
+      img.src = mapData.img;
+      img.alt = mapName;
+      img.onerror = () => img.style.display = "none";
+      card.appendChild(img);
     }
-    
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "map-name";
+    nameDiv.textContent = mapName || "未選択";
+    card.appendChild(nameDiv);
+
     const roundDiv = document.createElement("div");
     roundDiv.className = "map-round";
     roundDiv.textContent = r;
     card.appendChild(roundDiv);
-    
-    container.appendChild(card);
+
+    globalContainer.appendChild(card);
   });
+
+  // 2. ピック左（現在ラウンドだけ大きく）
+  const currentContainer = document.getElementById("current-map-display");
+  currentContainer.innerHTML = "";
+  const sel = document.getElementById(`map-select-${currentRound}`);
+  const mapName = sel ? sel.value : "";
+  const mapData = maps.find(m => m.name === mapName);
+
+  const card = document.createElement("div");
+  card.className = "current-map-card" + (mapName ? "" : " empty");
+
+  if (mapName && mapData && mapData.img) {
+    const img = document.createElement("img");
+    img.src = mapData.img;
+    img.alt = mapName;
+    img.onerror = () => img.style.display = "none";
+    card.appendChild(img);
+  }
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "map-name";
+  nameDiv.textContent = mapName || "未選択";
+  card.appendChild(nameDiv);
+
+  currentContainer.appendChild(card);
+  document.getElementById("current-map-round-label").textContent = currentRound;
 }
 
 function rebuildTeamBans() {
   const counts = getBanCounts(currentRound);
   createSlotsInContainer(document.getElementById("teamA-bans"), counts.teamA, "ban", "hunter");
   const title = document.getElementById("teamA-ban-title");
-  if (counts.teamA === 0) {
-    title.textContent = `BAN（このラウンドは不可）`;
-  } else {
-    title.textContent = `BAN（ハンター ${counts.teamA}体）`;
-  }
+  title.textContent = counts.teamA === 0 ? `BAN（このラウンドは不可）` : `BAN（ハンター ${counts.teamA}体）`;
   createSlotsInContainer(document.getElementById("teamB-bans"), counts.teamB, "ban", "survivor");
   updateBanned();
 }
@@ -1538,17 +1433,13 @@ function completePick() {
     });
   }
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
-    document.getElementById(id).querySelectorAll(".slot").forEach(slot => {
-      slot.innerHTML = "";
-    });
+    document.getElementById(id).querySelectorAll(".slot").forEach(slot => slot.innerHTML = "");
   });
   updateBanned();
   document.getElementById("status-msg").textContent = `${currentRound} のグローバルBANに反映しました`;
   const rounds = ROUND_CONFIG[currentMode];
   const idx = rounds.indexOf(currentRound);
-  if (idx >= 0 && idx < rounds.length - 1) {
-    setCurrentRound(rounds[idx + 1]);
-  }
+  if (idx >= 0 && idx < rounds.length - 1) setCurrentRound(rounds[idx + 1]);
   saveState();
 }
 
@@ -1557,17 +1448,13 @@ function resetAll() {
   bannedNames.clear();
   usedMaps.clear();
   document.getElementById("status-msg").textContent = "";
-
   ROUND_CONFIG[currentMode].forEach(r => {
     const sel = document.getElementById(`map-select-${r}`);
     if (sel) sel.value = "";
   });
-
   document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-  const survivorBtn = [...document.querySelectorAll(".filter-btn")]
-    .find(b => b.textContent.includes("サバイバー"));
+  const survivorBtn = [...document.querySelectorAll(".filter-btn")].find(b => b.textContent.includes("サバイバー"));
   if (survivorBtn) survivorBtn.classList.add("active");
-
   renderPool("survivor");
   updateUsedMaps();
   renderMapsDisplay();
@@ -1614,7 +1501,6 @@ if (localStorage.getItem("idv-pick-theme") === "light") {
 
 createSlotsInContainer(document.getElementById("teamA-surv"), 4, "pick", "survivor");
 createSlotsInContainer(document.getElementById("teamB-hunter"), 1, "pick", "hunter");
-
 buildRoundButtons();
 buildGlobalRounds();
 rebuildTeamBans();
@@ -1624,17 +1510,10 @@ checkCompleteButton();
 ["teamA-surv", "teamB-hunter"].forEach(id => {
   new MutationObserver(checkCompleteButton).observe(document.getElementById(id), { childList: true, subtree: true });
 });
-
-document.querySelectorAll(".team-name").forEach(el => {
-  el.addEventListener("input", saveState);
-});
-
+document.querySelectorAll(".team-name").forEach(el => el.addEventListener("input", saveState));
 document.addEventListener("contextmenu", e => {
-  if (e.target.closest(".char")) {
-    e.preventDefault();
-  }
+  if (e.target.closest(".char")) e.preventDefault();
 });
-
 loadState();
 </script>
 </body>
