@@ -6,1531 +6,1534 @@
 <title>第五人格 大会ピックシミュレーター</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
- :root {
- --bg: #0d0d12;
- --panel: #1a1a24;
- --border: #333;
- --border2: #3a3a50;
- --text: #e0e0e0;
- --text-muted: #888;
- --text-dim: #666;
- --slot-bg: #12121a;
- --slot-border: #444;
- --over-bg: #2a2a40;
- --gold: #c9a227;
- --blue: #4a90e2;
- --red: #e24a4a;
- --green: #33aa66;
- --btn-bg: #2a2a40;
- --btn-text: #ddd;
- --reject-bg: #4a1a1a;
- --reset-bg: #3a1a1a;
- --reset-border: #aa3333;
- --reset-text: #ffaaaa;
- --char-noimg: #2a2a3a;
- }
- body.light {
- --bg: #f0f2f5;
- --panel: #ffffff;
- --border: #c8cdd4;
- --border2: #b0b6c0;
- --text: #1a1a24;
- --text-muted: #666;
- --text-dim: #888;
- --slot-bg: #e8ebf0;
- --slot-border: #aab0bb;
- --over-bg: #d0d5de;
- --gold: #b8941f;
- --blue: #2a6fbf;
- --red: #c93a3a;
- --green: #228844;
- --btn-bg: #e4e7ed;
- --btn-text: #222;
- --reject-bg: #f8d0d0;
- --reset-bg: #f5e0e0;
- --reset-border: #cc6666;
- --reset-text: #aa3333;
- --char-noimg: #d8dce4;
- }
+  :root {
+    --bg: #0d0d12;
+    --panel: #1a1a24;
+    --border: #333;
+    --border2: #3a3a50;
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --text-dim: #666;
+    --slot-bg: #12121a;
+    --slot-border: #444;
+    --over-bg: #2a2a40;
+    --gold: #c9a227;
+    --blue: #4a90e2;
+    --red: #e24a4a;
+    --green: #33aa66;
+    --btn-bg: #2a2a40;
+    --btn-text: #ddd;
+    --reject-bg: #4a1a1a;
+    --reset-bg: #3a1a1a;
+    --reset-border: #aa3333;
+    --reset-text: #ffaaaa;
+    --char-noimg: #2a2a3a;
+  }
+  body.light {
+    --bg: #f0f2f5;
+    --panel: #ffffff;
+    --border: #c8cdd4;
+    --border2: #b0b6c0;
+    --text: #1a1a24;
+    --text-muted: #666;
+    --text-dim: #888;
+    --slot-bg: #e8ebf0;
+    --slot-border: #aab0bb;
+    --over-bg: #d0d5de;
+    --gold: #b8941f;
+    --blue: #2a6fbf;
+    --red: #c93a3a;
+    --green: #228844;
+    --btn-bg: #e4e7ed;
+    --btn-text: #222;
+    --reject-bg: #f8d0d0;
+    --reset-bg: #f5e0e0;
+    --reset-border: #cc6666;
+    --reset-text: #aa3333;
+    --char-noimg: #d8dce4;
+  }
 
- * { box-sizing: border-box; margin: 0; padding: 0; }
- body {
- background: var(--bg);
- color: var(--text);
- font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
- height: 100dvh;
- max-width: 1400px;
- margin: 0 auto;
- display: flex;
- gap: 10px;
- padding: 8px;
- overflow: auto;
- transition: background 0.2s, color 0.2s;
- }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
+    height: 100dvh;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+    overflow: auto;
+    transition: background 0.2s, color 0.2s;
+  }
 
- .sidebar {
- width: 132px;
- flex-shrink: 0;
- display: flex;
- flex-direction: column;
- gap: 7px;
- background: var(--panel);
- border: 1px solid var(--border);
- border-radius: 8px;
- padding: 10px 7px;
- overflow-y: auto;
- }
- .sidebar h1 {
- color: var(--gold);
- font-size: 0.85em;
- text-align: center;
- line-height: 1.3;
- margin-bottom: 2px;
- text-shadow: 0 0 6px rgba(201,162,39,0.35);
- }
- body.light .sidebar h1 { text-shadow: none; }
- .side-label {
- font-size: 0.72em;
- color: var(--text-muted);
- text-align: center;
- margin-top: 4px;
- }
- .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
- width: 100%;
- padding: 7px 4px;
- border-radius: 5px;
- font-size: 12.5px;
- font-weight: bold;
- cursor: pointer;
- border: 1px solid var(--border2);
- background: var(--btn-bg);
- color: var(--btn-text);
- }
- .theme-btn { font-size: 12px; margin-bottom: 2px; }
- .mode-btn.active { background: var(--gold); color: #111; border-color: var(--gold); }
- .round-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
- .round-btn.ot.active { background: var(--red); border-color: var(--red); }
- .complete-btn {
- background: linear-gradient(135deg, var(--green), #1a6b3a);
- border: none;
- color: #fff;
- margin-top: 6px;
- font-size: 11.5px;
- line-height: 1.3;
- }
- .complete-btn:disabled {
- background: var(--btn-bg);
- color: var(--text-muted);
- cursor: not-allowed;
- }
- .complete-btn:not(:disabled):hover { filter: brightness(1.1); }
- .save-btn {
- background: linear-gradient(135deg, var(--gold), #a8841a);
- color: #111;
- border: none;
- }
- .save-btn:hover { filter: brightness(1.08); }
- .reset-btn {
- background: var(--reset-bg);
- border: 1px solid var(--reset-border);
- color: var(--reset-text);
- margin-top: auto;
- }
- .status-msg {
- font-size: 11px;
- text-align: center;
- color: var(--green);
- line-height: 1.35;
- min-height: 32px;
- padding: 4px 2px;
- word-break: break-all;
- }
- body.light .status-msg { color: #1a7a3a; }
+  .sidebar {
+    width: 132px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 7px;
+    overflow-y: auto;
+  }
+  .sidebar h1 {
+    color: var(--gold);
+    font-size: 0.85em;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 2px;
+    text-shadow: 0 0 6px rgba(201,162,39,0.35);
+  }
+  body.light .sidebar h1 { text-shadow: none; }
+  .side-label {
+    font-size: 0.72em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+    width: 100%;
+    padding: 7px 4px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    background: var(--btn-bg);
+    color: var(--btn-text);
+  }
+  .theme-btn { font-size: 12px; margin-bottom: 2px; }
+  .mode-btn.active { background: var(--gold); color: #111; border-color: var(--gold); }
+  .round-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .round-btn.ot.active { background: var(--red); border-color: var(--red); }
+  .complete-btn {
+    background: linear-gradient(135deg, var(--green), #1a6b3a);
+    border: none;
+    color: #fff;
+    margin-top: 6px;
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+  .complete-btn:disabled {
+    background: var(--btn-bg);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+  .complete-btn:not(:disabled):hover { filter: brightness(1.1); }
+  .save-btn {
+    background: linear-gradient(135deg, var(--gold), #a8841a);
+    color: #111;
+    border: none;
+  }
+  .save-btn:hover { filter: brightness(1.08); }
+  .reset-btn {
+    background: var(--reset-bg);
+    border: 1px solid var(--reset-border);
+    color: var(--reset-text);
+    margin-top: auto;
+  }
+  .status-msg {
+    font-size: 11px;
+    text-align: center;
+    color: var(--green);
+    line-height: 1.35;
+    min-height: 32px;
+    padding: 4px 2px;
+    word-break: break-all;
+  }
+  body.light .status-msg { color: #1a7a3a; }
 
- .main {
- flex: 1;
- min-width: 0;
- display: flex;
- flex-direction: column;
- gap: 8px;
- overflow: hidden;
- }
+  .main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+  }
 
- #capture-area {
- background: var(--bg);
- padding: 5px;
- border-radius: 6px;
- flex-shrink: 0;
- }
+  #capture-area {
+    background: var(--bg);
+    padding: 5px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
 
- /* ===== グローバルBAN + 左マップ ===== */
- .global-wrapper {
- display: flex;
- gap: 8px;
- margin-bottom: 8px;
- }
- .global-maps-panel {
- width: 108px;
- flex-shrink: 0;
- background: var(--panel);
- border: 2px solid var(--border2);
- border-radius: 6px;
- padding: 5px;
- display: flex;
- flex-direction: column;
- }
- .global-maps-title {
- font-size: 0.7em;
- color: var(--text-muted);
- text-align: center;
- margin-bottom: 5px;
- }
- .global-maps-display {
- display: flex;
- flex-direction: column;
- gap: 4px;
- flex: 1;
- }
+  /* ===== グローバルBAN + 左マップ ===== */
+  .global-wrapper {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .global-maps-panel {
+    width: 108px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  .global-maps-title {
+    font-size: 0.7em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  .global-maps-display {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
 
- .global-row {
- display: flex;
- gap: 8px;
- flex: 1;
- min-width: 0;
- }
- .global-box {
- flex: 1;
- background: var(--panel);
- border: 2px solid var(--border2);
- border-radius: 6px;
- padding: 5px 6px;
- min-width: 0;
- }
- .global-box.surv { border-color: var(--blue); }
- .global-box.hunt { border-color: var(--red); }
- .global-title {
- font-size: 0.74em;
- color: var(--text-muted);
- text-align: center;
- margin-bottom: 4px;
- }
- .round-block {
- margin-bottom: 4px;
- padding: 3px;
- border-radius: 4px;
- transition: 0.15s;
- }
- .round-block.active-round {
- background: rgba(74, 144, 226, 0.15);
- outline: 1px solid var(--blue);
- }
- .round-block.active-round.ot {
- background: rgba(226, 74, 74, 0.15);
- outline: 1px solid var(--red);
- }
- body.light .round-block.active-round {
- background: rgba(42, 111, 191, 0.12);
- }
- body.light .round-block.active-round.ot {
- background: rgba(201, 58, 58, 0.12);
- }
+  .global-row {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  .global-box {
+    flex: 1;
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px 6px;
+    min-width: 0;
+  }
+  .global-box.surv { border-color: var(--blue); }
+  .global-box.hunt { border-color: var(--red); }
+  .global-title {
+    font-size: 0.74em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .round-block {
+    margin-bottom: 4px;
+    padding: 3px;
+    border-radius: 4px;
+    transition: 0.15s;
+  }
+  .round-block.active-round {
+    background: rgba(74, 144, 226, 0.15);
+    outline: 1px solid var(--blue);
+  }
+  .round-block.active-round.ot {
+    background: rgba(226, 74, 74, 0.15);
+    outline: 1px solid var(--red);
+  }
+  body.light .round-block.active-round {
+    background: rgba(42, 111, 191, 0.12);
+  }
+  body.light .round-block.active-round.ot {
+    background: rgba(201, 58, 58, 0.12);
+  }
 
- .round-content {
- display: flex;
- justify-content: space-between;
- gap: 5px;
- align-items: flex-start;
- }
- .used-area, .ban-area {
- display: flex;
- flex-direction: column;
- gap: 2px;
- }
- .used-area { align-items: flex-start; }
- .ban-area { align-items: flex-end; }
- .area-label {
- font-size: 0.62em;
- color: var(--text-dim);
- white-space: nowrap;
- }
- .round-block.active-round .area-label { color: var(--blue); font-weight: bold; }
- .round-block.active-round.ot .area-label { color: var(--red); }
+  .round-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    align-items: flex-start;
+  }
+  .used-area, .ban-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .used-area { align-items: flex-start; }
+  .ban-area { align-items: flex-end; }
+  .area-label {
+    font-size: 0.62em;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .round-block.active-round .area-label { color: var(--blue); font-weight: bold; }
+  .round-block.active-round.ot .area-label { color: var(--red); }
 
- .slots {
- display: flex;
- flex-wrap: wrap;
- gap: 4px;
- min-height: 48px;
- }
- .used-area .slots { justify-content: flex-start; }
- .ban-area .slots { justify-content: flex-end; }
+  .slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 48px;
+  }
+  .used-area .slots { justify-content: flex-start; }
+  .ban-area .slots { justify-content: flex-end; }
 
- /* ===== ピック部分 + 現在マップ1つ ===== */
- .teams-wrapper {
- display: flex;
- gap: 8px;
- }
- .current-map-panel {
- width: 128px;
- flex-shrink: 0;
- background: var(--panel);
- border: 2px solid var(--gold);
- border-radius: 6px;
- padding: 8px 6px;
- display: flex;
- flex-direction: column;
- align-items: center;
- }
- .current-map-title {
- font-size: 0.72em;
- color: var(--gold);
- text-align: center;
- margin-bottom: 6px;
- font-weight: bold;
- }
- .current-map-card {
- width: 100%;
- background: var(--slot-bg);
- border: 2px solid var(--slot-border);
- border-radius: 6px;
- overflow: hidden;
- text-align: center;
- }
- .current-map-card img {
- width: 100%;
- height: 90px;
- object-fit: cover;
- background: var(--char-noimg);
- display: block;
- }
- .current-map-card .map-name {
- font-size: 0.85em;
- padding: 6px 4px;
- font-weight: bold;
- line-height: 1.2;
- }
- .current-map-card.empty .map-name {
- color: var(--text-dim);
- padding: 36px 4px;
- }
- .current-map-round {
- font-size: 0.7em;
- color: var(--text-muted);
- margin-top: 5px;
- }
+  /* ===== ピック部分 + 現在マップ1つ ===== */
+  .teams-wrapper {
+    display: flex;
+    gap: 8px;
+  }
+  .current-map-panel {
+    width: 128px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    padding: 8px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .current-map-title {
+    font-size: 0.72em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 6px;
+    font-weight: bold;
+  }
+  .current-map-card {
+    width: 100%;
+    background: var(--slot-bg);
+    border: 2px solid var(--slot-border);
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .current-map-card img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    background: var(--char-noimg);
+    display: block;
+  }
+  .current-map-card .map-name {
+    font-size: 0.85em;
+    padding: 6px 4px;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+  .current-map-card.empty .map-name {
+    color: var(--text-dim);
+    padding: 36px 4px;
+  }
+  .current-map-round {
+    font-size: 0.7em;
+    color: var(--text-muted);
+    margin-top: 5px;
+  }
 
- .teams {
- display: flex;
- gap: 8px;
- flex: 1;
- min-width: 0;
- }
- .team {
- flex: 1;
- background: var(--panel);
- border: 2px solid var(--border2);
- border-radius: 6px;
- padding: 6px 7px;
- min-width: 0;
- }
- .team-a { border-color: var(--blue); }
- .team-b { border-color: var(--red); }
- .team-name {
- text-align: center;
- font-size: 1.05em;
- font-weight: bold;
- margin-bottom: 4px;
- outline: none;
- }
- .team-a .team-name { color: var(--blue); }
- .team-b .team-name { color: var(--red); }
- .section-title {
- font-size: 0.7em;
- color: var(--text-muted);
- margin: 4px 0 3px;
- }
+  .teams {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  .team {
+    flex: 1;
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 6px 7px;
+    min-width: 0;
+  }
+  .team-a { border-color: var(--blue); }
+  .team-b { border-color: var(--red); }
+  .team-name {
+    text-align: center;
+    font-size: 1.05em;
+    font-weight: bold;
+    margin-bottom: 4px;
+    outline: none;
+  }
+  .team-a .team-name { color: var(--blue); }
+  .team-b .team-name { color: var(--red); }
+  .section-title {
+    font-size: 0.7em;
+    color: var(--text-muted);
+    margin: 4px 0 3px;
+  }
 
- .slot {
- width: 48px;
- height: 58px;
- background: var(--slot-bg);
- border: 2px dashed var(--slot-border);
- border-radius: 4px;
- display: flex;
- align-items: center;
- justify-content: center;
- transition: 0.12s;
- position: relative;
- }
- .slot.ban { border-color: var(--red); }
- .slot.pick { border-color: var(--green); }
- .slot.over { background: var(--over-bg); border-style: solid; }
- .slot.reject {
- background: var(--reject-bg) !important;
- border-color: var(--red) !important;
- }
+  .slot {
+    width: 48px;
+    height: 58px;
+    background: var(--slot-bg);
+    border: 2px dashed var(--slot-border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.12s;
+    position: relative;
+  }
+  .slot.ban { border-color: var(--red); }
+  .slot.pick { border-color: var(--green); }
+  .slot.over { background: var(--over-bg); border-style: solid; }
+  .slot.reject {
+    background: var(--reject-bg) !important;
+    border-color: var(--red) !important;
+  }
 
- .clear-btn {
- position: absolute;
- top: -6px;
- right: -6px;
- width: 17px;
- height: 17px;
- background: #c33;
- color: #fff;
- border: none;
- border-radius: 50%;
- font-size: 12px;
- line-height: 1;
- cursor: pointer;
- z-index: 10;
- padding: 0;
- display: flex;
- align-items: center;
- justify-content: center;
- box-shadow: 0 1px 3px rgba(0,0,0,0.4);
- }
- .clear-btn:hover { background: #e44; }
+  .clear-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 17px;
+    height: 17px;
+    background: #c33;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  .clear-btn:hover { background: #e44; }
 
- .char {
- width: 100%;
- height: 100%;
- display: flex;
- flex-direction: column;
- align-items: center;
- justify-content: center;
- cursor: grab;
- user-select: none;
- border-radius: 3px;
- overflow: hidden;
- }
- .char img {
- width: 100%;
- height: auto;
- aspect-ratio: 1 / 1;
- object-fit: cover;
- border-radius: 3px;
- background: var(--char-noimg);
- }
- .char .name {
- font-size: 7.5px;
- line-height: 1.05;
- margin-top: 2px;
- text-align: center;
- max-width: 44px;
- overflow: hidden;
- text-overflow: ellipsis;
- white-space: nowrap;
- }
- .char.no-img { background: var(--char-noimg); }
- .char.no-img .name { font-size: 9px; white-space: normal; }
- .char.survivor { border-left: 2px solid var(--blue); }
- .char.hunter { border-left: 2px solid var(--red); }
- .char.dragging { opacity: 0.4; }
- .char.banned {
- opacity: 0.38;
- filter: grayscale(70%);
- }
+  .char {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .char img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 3px;
+    background: var(--char-noimg);
+  }
+  .char .name {
+    font-size: 7.5px;
+    line-height: 1.05;
+    margin-top: 2px;
+    text-align: center;
+    max-width: 44px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .char.no-img { background: var(--char-noimg); }
+  .char.no-img .name { font-size: 9px; white-space: normal; }
+  .char.survivor { border-left: 2px solid var(--blue); }
+  .char.hunter { border-left: 2px solid var(--red); }
+  .char.dragging { opacity: 0.4; }
+  .char.banned {
+    opacity: 0.38;
+    filter: grayscale(70%);
+  }
 
- .pool {
- background: var(--panel);
- border: 2px solid var(--border2);
- border-radius: 6px;
- padding: 6px 7px;
- flex: 1;
- min-height: 0;
- display: flex;
- flex-direction: column;
- }
- .pool-controls {
- display: flex;
- gap: 5px;
- margin-bottom: 5px;
- flex-wrap: wrap;
- align-items: center;
- }
- .filter-btn {
- background: var(--btn-bg);
- color: var(--btn-text);
- border: 1px solid var(--border2);
- padding: 4px 10px;
- border-radius: 4px;
- cursor: pointer;
- font-size: 12px;
- }
- .filter-btn.active {
- background: var(--gold);
- color: #111;
- border-color: var(--gold);
- }
- .char-grid {
- display: grid;
- grid-template-columns: repeat(auto-fill, 56px);
- gap: 3px;
- overflow-y: auto;
- flex: 1;
- align-content: start;
- }
- .char-grid .char {
- width: 56px;
- height: 68px;
- border: 1px solid var(--slot-border);
- }
- .char-grid .char .name {
- font-size: 8.5px;
- max-width: 52px;
- }
- .char-grid .char.no-img .name {
- font-size: 10px;
- }
+  .pool {
+    background: var(--panel);
+    border: 2px solid var(--border2);
+    border-radius: 6px;
+    padding: 6px 7px;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pool-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-btn {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border: 1px solid var(--border2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .filter-btn.active {
+    background: var(--gold);
+    color: #111;
+    border-color: var(--gold);
+  }
+  .char-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 56px);
+    gap: 3px;
+    overflow-y: auto;
+    flex: 1;
+    align-content: start;
+  }
+  .char-grid .char {
+    width: 56px;
+    height: 68px;
+    border: 1px solid var(--slot-border);
+  }
+  .char-grid .char .name {
+    font-size: 8.5px;
+    max-width: 52px;
+  }
+  .char-grid .char.no-img .name {
+    font-size: 10px;
+  }
 
- .map-select {
- width: 100%;
- margin-top: 3px;
- padding: 2px 3px;
- font-size: 0.62em;
- border-radius: 3px;
- border: 1px solid var(--border2);
- background: var(--slot-bg);
- color: var(--text);
- cursor: pointer;
- }
- .map-select:focus {
- outline: 1px solid var(--blue);
- }
+  .map-select {
+    width: 100%;
+    margin-top: 3px;
+    padding: 2px 3px;
+    font-size: 0.62em;
+    border-radius: 3px;
+    border: 1px solid var(--border2);
+    background: var(--slot-bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .map-select:focus {
+    outline: 1px solid var(--blue);
+  }
 
- /* 小さなマップカード（使用マップ用） */
- .map-card-sm {
- background: var(--slot-bg);
- border: 2px solid var(--slot-border);
- border-radius: 4px;
- overflow: hidden;
- text-align: center;
- display: flex;
- flex-direction: column;
- }
- .map-card-sm.active-map {
- border-color: var(--gold);
- }
- .map-card-sm img {
- width: 100%;
- height: auto;
- aspect-ratio: 164 / 104;
- object-fit: cover;
- background: var(--char-noimg);
- display: block;
- flex-shrink: 0;
- }
- .map-card-sm .map-name {
- font-size: 0.65em;
- padding: 2px 1px;
- line-height: 1.1;
- white-space: nowrap;
- overflow: hidden;
- text-overflow: ellipsis;
- }
- .map-card-sm .map-round {
- font-size: 0.58em;
- color: var(--text-dim);
- padding-bottom: 1px;
- }
- .map-card-sm.empty .map-name {
- color: var(--text-dim);
- }
- .map-card-sm .map-select {
- margin-top: 2px;
- font-size: 0.58em;
- padding: 1px 2px;
- }
+  /* 小さなマップカード（使用マップ用） */
+  .map-card-sm {
+    background: var(--slot-bg);
+    border: 2px solid var(--slot-border);
+    border-radius: 4px;
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .map-card-sm.active-map {
+    border-color: var(--gold);
+  }
+  .map-card-sm img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 164 / 104;
+    object-fit: cover;
+    background: var(--char-noimg);
+    display: block;
+    flex-shrink: 0;
+  }
+  .map-card-sm .map-name {
+    font-size: 0.65em;
+    padding: 2px 1px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .map-card-sm .map-round {
+    font-size: 0.58em;
+    color: var(--text-dim);
+    padding-bottom: 1px;
+  }
+  .map-card-sm.empty .map-name {
+    color: var(--text-dim);
+  }
+  .map-card-sm .map-select {
+    margin-top: 2px;
+    font-size: 0.58em;
+    padding: 1px 2px;
+  }
 
- body.bo5 .slot {
- width: 42px;
- height: 50px;
- }
- body.bo5 .char .name {
- font-size: 6.5px;
- max-width: 38px;
- }
- body.bo5 .char.no-img .name {
- font-size: 8px;
- }
- body.bo5 .char-grid {
- grid-template-columns: repeat(auto-fill, 48px);
- }
- body.bo5 .char-grid .char {
- width: 48px;
- height: 58px;
- }
- body.bo5 .char-grid .char .name {
- font-size: 7.5px;
- max-width: 44px;
- }
- body.bo5 .char-grid .char.no-img .name {
- font-size: 9px;
- }
- body.bo5 .round-block {
- margin-bottom: 2px;
- padding: 2px;
- }
- body.bo5 .area-label {
- font-size: 0.55em;
- }
- body.bo5 .global-box {
- padding: 3px 4px;
- }
- body.bo5 .global-title {
- font-size: 0.66em;
- }
- body.bo5 .slots {
- gap: 3px;
- min-height: 40px;
- }
- body.bo5 .clear-btn {
- width: 15px;
- height: 15px;
- font-size: 11px;
- top: -5px;
- right: -5px;
- }
- body.bo5 .section-title {
- font-size: 0.65em;
- margin: 2px 0 2px;
- }
- body.bo5 .team {
- padding: 4px 5px;
- }
- body.bo5 .team-name {
- font-size: 0.92em;
- margin-bottom: 2px;
- }
- body.bo5 .global-maps-panel {
- width: 95px;
- }
- body.bo5 .current-map-panel {
- width: 110px;
- }
- body.bo5 .current-map-card img {
- height: 75px;
- }
+  body.bo5 .slot {
+    width: 42px;
+    height: 50px;
+  }
+  body.bo5 .char .name {
+    font-size: 6.5px;
+    max-width: 38px;
+  }
+  body.bo5 .char.no-img .name {
+    font-size: 8px;
+  }
+  body.bo5 .char-grid {
+    grid-template-columns: repeat(auto-fill, 48px);
+  }
+  body.bo5 .char-grid .char {
+    width: 48px;
+    height: 58px;
+  }
+  body.bo5 .char-grid .char .name {
+    font-size: 7.5px;
+    max-width: 44px;
+  }
+  body.bo5 .char-grid .char.no-img .name {
+    font-size: 9px;
+  }
+  body.bo5 .round-block {
+    margin-bottom: 2px;
+    padding: 2px;
+  }
+  body.bo5 .area-label {
+    font-size: 0.55em;
+  }
+  body.bo5 .global-box {
+    padding: 3px 4px;
+  }
+  body.bo5 .global-title {
+    font-size: 0.66em;
+  }
+  body.bo5 .slots {
+    gap: 3px;
+    min-height: 40px;
+  }
+  body.bo5 .clear-btn {
+    width: 15px;
+    height: 15px;
+    font-size: 11px;
+    top: -5px;
+    right: -5px;
+  }
+  body.bo5 .section-title {
+    font-size: 0.65em;
+    margin: 2px 0 2px;
+  }
+  body.bo5 .team {
+    padding: 4px 5px;
+  }
+  body.bo5 .team-name {
+    font-size: 0.92em;
+    margin-bottom: 2px;
+  }
+  body.bo5 .global-maps-panel {
+    width: 95px;
+  }
+  body.bo5 .current-map-panel {
+    width: 110px;
+  }
+  body.bo5 .current-map-card img {
+    height: 75px;
+  }
 
 @media (max-height: 520px), (orientation: landscape) and (max-width: 950px) {
- body { padding: 3px; gap: 4px; }
- .sidebar { width: 100px; padding: 5px 4px; gap: 4px; }
- .sidebar h1 { font-size: 0.72em; }
- .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
- padding: 5px 3px; font-size: 11px;
- }
- .side-label { font-size: 0.65em; margin-top: 2px; }
- .status-msg { font-size: 10px; min-height: 24px; }
- .main { gap: 4px; }
- #capture-area { padding: 2px; }
- .global-wrapper { gap: 4px; margin-bottom: 4px; }
- .global-maps-panel { width: 85px; }
- .global-row { gap: 4px; }
- .global-box { padding: 2px 3px; }
- .global-title { font-size: 0.6em; margin-bottom: 2px; }
- .round-block { margin-bottom: 1px; padding: 1px; }
- .area-label { font-size: 0.5em; }
- .slots { gap: 2px; min-height: 32px; }
- .slot { width: 34px; height: 42px; }
- .char img { width: 78%; max-width: 28px; }
- .char .name { font-size: 5.8px; max-width: 32px; margin-top: 1px; }
- .char.no-img .name { font-size: 7px; }
- .clear-btn { width: 13px; height: 13px; font-size: 10px; top: -4px; right: -4px; }
- .teams-wrapper { gap: 4px; }
- .current-map-panel { width: 95px; }
- .current-map-card img { height: 60px; }
- .teams { gap: 4px; }
- .team { padding: 3px 4px; }
- .team-name { font-size: 0.85em; margin-bottom: 2px; }
- .section-title { font-size: 0.58em; margin: 2px 0 1px; }
- .pool { padding: 3px 4px; }
- .pool-controls { margin-bottom: 3px; gap: 3px; }
- .filter-btn { padding: 3px 7px; font-size: 11px; }
- .char-grid { grid-template-columns: repeat(auto-fill, 42px); gap: 2px; }
- .char-grid .char { width: 42px; height: 52px; }
- .char-grid .char .name { font-size: 7px; max-width: 40px; }
- .char-grid .char.no-img .name { font-size: 8px; }
- body.bo5 .slot { width: 30px; height: 38px; }
- body.bo5 .char-grid { grid-template-columns: repeat(auto-fill, 38px); }
- body.bo5 .char-grid .char { width: 38px; height: 48px; }
+  body { padding: 3px; gap: 4px; }
+  .sidebar { width: 100px; padding: 5px 4px; gap: 4px; }
+  .sidebar h1 { font-size: 0.72em; }
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+    padding: 5px 3px; font-size: 11px;
+  }
+  .side-label { font-size: 0.65em; margin-top: 2px; }
+  .status-msg { font-size: 10px; min-height: 24px; }
+  .main { gap: 4px; }
+  #capture-area { padding: 2px; }
+  .global-wrapper { gap: 4px; margin-bottom: 4px; }
+  .global-maps-panel { width: 85px; }
+  .global-row { gap: 4px; }
+  .global-box { padding: 2px 3px; }
+  .global-title { font-size: 0.6em; margin-bottom: 2px; }
+  .round-block { margin-bottom: 1px; padding: 1px; }
+  .area-label { font-size: 0.5em; }
+  .slots { gap: 2px; min-height: 32px; }
+  .slot { width: 34px; height: 42px; }
+  .char img { width: 78%; max-width: 28px; }
+  .char .name { font-size: 5.8px; max-width: 32px; margin-top: 1px; }
+  .char.no-img .name { font-size: 7px; }
+  .clear-btn { width: 13px; height: 13px; font-size: 10px; top: -4px; right: -4px; }
+  .teams-wrapper { gap: 4px; }
+  .current-map-panel { width: 95px; }
+  .current-map-card img { height: 60px; }
+  .teams { gap: 4px; }
+  .team { padding: 3px 4px; }
+  .team-name { font-size: 0.85em; margin-bottom: 2px; }
+  .section-title { font-size: 0.58em; margin: 2px 0 1px; }
+  .pool { padding: 3px 4px; }
+  .pool-controls { margin-bottom: 3px; gap: 3px; }
+  .filter-btn { padding: 3px 7px; font-size: 11px; }
+  .char-grid { grid-template-columns: repeat(auto-fill, 42px); gap: 2px; }
+  .char-grid .char { width: 42px; height: 52px; }
+  .char-grid .char .name { font-size: 7px; max-width: 40px; }
+  .char-grid .char.no-img .name { font-size: 8px; }
+  body.bo5 .slot { width: 30px; height: 38px; }
+  body.bo5 .char-grid { grid-template-columns: repeat(auto-fill, 38px); }
+  body.bo5 .char-grid .char { width: 38px; height: 48px; }
 }
 
 @media screen and (max-width: 900px) {
- body {
- zoom: 0.5;
- -moz-transform: scale(0.5);
- -moz-transform-origin: 0 0;
- }
- .slot { width: 72px !important; height: 88px !important; }
- .char img { width: 90% !important; max-width: 64px !important; }
- .char .name { font-size: 12px !important; max-width: 68px !important; margin-top: 2px !important; }
- .char.no-img .name { font-size: 14px !important; }
- .clear-btn { width: 28px !important; height: 28px !important; font-size: 20px !important; top: -8px !important; right: -8px !important; }
- .char-grid { grid-template-columns: repeat(auto-fill, 90px) !important; gap: 5px !important; }
- .char-grid .char { width: 90px !important; height: 110px !important; }
- .char-grid .char .name { font-size: 14px !important; max-width: 86px !important; }
- .char-grid .char.no-img .name { font-size: 16px !important; }
- body.bo5 .slot { width: 64px !important; height: 80px !important; }
- body.bo5 .char-grid { grid-template-columns: repeat(auto-fill, 80px) !important; }
- body.bo5 .char-grid .char { width: 80px !important; height: 100px !important; }
- .global-maps-panel { width: 140px !important; }
- .current-map-panel { width: 160px !important; }
- .current-map-card img { height: 110px !important; }
+  body {
+    zoom: 0.5;
+    -moz-transform: scale(0.5);
+    -moz-transform-origin: 0 0;
+  }
+  .slot { width: 72px !important; height: 88px !important; }
+  .char img { width: 90% !important; max-width: 64px !important; }
+  .char .name { font-size: 12px !important; max-width: 68px !important; margin-top: 2px !important; }
+  .char.no-img .name { font-size: 14px !important; }
+  .clear-btn { width: 28px !important; height: 28px !important; font-size: 20px !important; top: -8px !important; right: -8px !important; }
+  .char-grid { grid-template-columns: repeat(auto-fill, 90px) !important; gap: 5px !important; }
+  .char-grid .char { width: 90px !important; height: 110px !important; }
+  .char-grid .char .name { font-size: 14px !important; max-width: 86px !important; }
+  .char-grid .char.no-img .name { font-size: 16px !important; }
+  body.bo5 .slot { width: 64px !important; height: 80px !important; }
+  body.bo5 .char-grid { grid-template-columns: repeat(auto-fill, 80px) !important; }
+  body.bo5 .char-grid .char { width: 80px !important; height: 100px !important; }
+  .global-maps-panel { width: 140px !important; }
+  .current-map-panel { width: 160px !important; }
+  .current-map-card img { height: 110px !important; }
 }
 
 @media screen and (max-width: 900px) and (orientation: portrait) {
- body {
- flex-direction: column;
- height: auto;
- min-height: 100dvh;
- padding: 6px;
- gap: 8px;
- }
- .sidebar {
- width: 100%;
- flex-direction: row;
- flex-wrap: wrap;
- justify-content: center;
- align-items: center;
- padding: 8px;
- gap: 6px;
- overflow: visible;
- }
- .sidebar h1 {
- width: 100%;
- font-size: 1.05em;
- margin-bottom: 4px;
- white-space: nowrap;
- }
- .sidebar h1 br { display: none; }
- .side-label { display: none; }
- .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
- width: auto;
- min-width: 70px;
- flex: 1 1 auto;
- padding: 8px 6px;
- font-size: 13px;
- }
- #round-buttons {
- display: flex !important;
- flex-direction: row !important;
- flex-wrap: wrap;
- gap: 5px;
- width: 100%;
- justify-content: center;
- }
- .complete-btn, .reset-btn { margin-top: 0; }
- .status-msg { width: 100%; min-height: 28px; }
- .main { width: 100%; overflow: visible; }
- .global-wrapper { flex-direction: column; }
- .global-maps-panel { width: 100% !important; }
- .global-maps-display { flex-direction: row; flex-wrap: wrap; justify-content: center; }
- .map-card-sm { width: 110px; }
- .teams-wrapper { flex-direction: column; }
- .current-map-panel { width: 100% !important; }
+  body {
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    padding: 6px;
+    gap: 8px;
+  }
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    gap: 6px;
+    overflow: visible;
+  }
+  .sidebar h1 {
+    width: 100%;
+    font-size: 1.05em;
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+  .sidebar h1 br { display: none; }
+  .side-label { display: none; }
+  .mode-btn, .round-btn, .save-btn, .reset-btn, .complete-btn, .theme-btn {
+    width: auto;
+    min-width: 70px;
+    flex: 1 1 auto;
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  #round-buttons {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 5px;
+    width: 100%;
+    justify-content: center;
+  }
+  .complete-btn, .reset-btn { margin-top: 0; }
+  .status-msg { width: 100%; min-height: 28px; }
+  .main { width: 100%; overflow: visible; }
+  .global-wrapper { flex-direction: column; }
+  .global-maps-panel { width: 100% !important; }
+  .global-maps-display { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .map-card-sm { width: 110px; }
+  .teams-wrapper { flex-direction: column; }
+  .current-map-panel { width: 100% !important; }
 }
 
 .char, .char img {
- -webkit-user-select: none;
- user-select: none;
- -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 </style>
 </head>
 <body>
 
 <div class="sidebar">
- <h1>第五人格<br>大会ピック<br>シミュレーター</h1>
- <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">ライトモードへ</button>
- <div class="side-label">モード</div>
- <button class="mode-btn active" id="btn-bo3" onclick="setMode('BO3')">BO3</button>
- <button class="mode-btn" id="btn-bo5" onclick="setMode('BO5')">BO5</button>
- <div class="side-label">現在ラウンド</div>
- <div id="round-buttons" style="display:flex;flex-direction:column;gap:4px;"></div>
- <button class="complete-btn" id="complete-btn" onclick="completePick()" disabled>
- ピック完了<br>→グローバルBANへ
- </button>
- <button class="save-btn" onclick="saveAsImage()">画像で保存</button>
- <div class="status-msg" id="status-msg"></div>
- <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
+  <h1>第五人格<br>大会ピック<br>シミュレーター</h1>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">ライトモードへ</button>
+  <div class="side-label">モード</div>
+  <button class="mode-btn active" id="btn-bo3" onclick="setMode('BO3')">BO3</button>
+  <button class="mode-btn" id="btn-bo5" onclick="setMode('BO5')">BO5</button>
+  <div class="side-label">現在ラウンド</div>
+  <div id="round-buttons" style="display:flex;flex-direction:column;gap:4px;"></div>
+  <button class="complete-btn" id="complete-btn" onclick="completePick()" disabled>
+    ピック完了<br>→グローバルBANへ
+  </button>
+  <button class="save-btn" onclick="saveAsImage()">画像で保存</button>
+  <div class="status-msg" id="status-msg"></div>
+  <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
 </div>
 
 <div class="main">
- <div id="capture-area">
- <!-- グローバルBAN + 左に全マップ -->
- <div class="global-wrapper">
- <div class="global-maps-panel">
- <div class="global-maps-title">使用マップ</div>
- <div class="global-maps-display" id="global-maps-display"></div>
- </div>
- <div class="global-row">
- <div class="global-box surv">
- <div class="global-title">グローバルBAN（サバイバー）</div>
- <div id="global-surv-rounds"></div>
- </div>
- <div class="global-box hunt">
- <div class="global-title">グローバルBAN（ハンター）</div>
- <div id="global-hunt-rounds"></div>
- </div>
- </div>
- </div>
+  <div id="capture-area">
+    <!-- グローバルBAN + 左に全マップ -->
+    <div class="global-wrapper">
+      <div class="global-maps-panel">
+        <div class="global-maps-title">使用マップ</div>
+        <div class="global-maps-display" id="global-maps-display"></div>
+      </div>
+      <div class="global-row">
+        <div class="global-box surv">
+          <div class="global-title">グローバルBAN（サバイバー）</div>
+          <div id="global-surv-rounds"></div>
+        </div>
+        <div class="global-box hunt">
+          <div class="global-title">グローバルBAN（ハンター）</div>
+          <div id="global-hunt-rounds"></div>
+        </div>
+      </div>
+    </div>
 
- <!-- ピック部分 + 左に現在マップ1つ -->
- <div class="teams-wrapper">
- <div class="current-map-panel">
- <div class="current-map-title">現在のマップ</div>
- <div id="current-map-display"></div>
- <div class="current-map-round" id="current-map-round-label"></div>
- </div>
- <div class="teams">
- <div class="team team-a">
- <div class="team-name" contenteditable="true">TEAM A（サバイバー）※テキスト入力可</div>
- <div class="section-title" id="teamA-ban-title">BAN（ハンター）</div>
- <div class="slots" id="teamA-bans"></div>
- <div class="section-title">PICK サバイバー</div>
- <div class="slots" id="teamA-surv"></div>
- </div>
- <div class="team team-b">
- <div class="team-name" contenteditable="true">TEAM B（ハンター）※テキスト入力可</div>
- <div class="section-title">BAN（サバイバー 4体）</div>
- <div class="slots" id="teamB-bans"></div>
- <div class="section-title">PICK ハンター</div>
- <div class="slots" id="teamB-hunter"></div>
- </div>
- </div>
- </div>
- </div>
+    <!-- ピック部分 + 左に現在マップ1つ -->
+    <div class="teams-wrapper">
+      <div class="current-map-panel">
+        <div class="current-map-title">現在のマップ</div>
+        <div id="current-map-display"></div>
+        <div class="current-map-round" id="current-map-round-label"></div>
+      </div>
+      <div class="teams">
+        <div class="team team-a">
+          <div class="team-name" contenteditable="true">TEAM A（サバイバー）※テキスト入力可</div>
+          <div class="section-title" id="teamA-ban-title">BAN（ハンター）</div>
+          <div class="slots" id="teamA-bans"></div>
+          <div class="section-title">PICK サバイバー</div>
+          <div class="slots" id="teamA-surv"></div>
+        </div>
+        <div class="team team-b">
+          <div class="team-name" contenteditable="true">TEAM B（ハンター）※テキスト入力可</div>
+          <div class="section-title">BAN（サバイバー 4体）</div>
+          <div class="slots" id="teamB-bans"></div>
+          <div class="section-title">PICK ハンター</div>
+          <div class="slots" id="teamB-hunter"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
- <div class="pool">
- <div class="pool-controls">
- <button class="filter-btn active" onclick="filterPool('survivor')">サバイバー</button>
- <button class="filter-btn" onclick="filterPool('hunter')">ハンター</button>
- <button class="filter-btn" onclick="filterPool('all')">全て</button>
- <span style="margin-left:auto;color:var(--text-muted);font-size:0.75em;">BAN/使用中は薄暗く表示　×で枠を空に</span>
- </div>
- <div class="char-grid" id="char-pool"></div>
- </div>
+  <div class="pool">
+    <div class="pool-controls">
+      <button class="filter-btn active" onclick="filterPool('survivor')">サバイバー</button>
+      <button class="filter-btn" onclick="filterPool('hunter')">ハンター</button>
+      <button class="filter-btn" onclick="filterPool('all')">全て</button>
+      <span style="margin-left:auto;color:var(--text-muted);font-size:0.75em;">BAN/使用中は薄暗く表示　×で枠を空に</span>
+    </div>
+    <div class="char-grid" id="char-pool"></div>
+  </div>
 </div>
 
 <script>
 const characters = [
- {name:"庭師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ed0150f9-e1f7-4d3e-9428-c08b253a6316.png"},
- {name:"弁護士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/1270f6b8-18d5-4dc5-9351-89e5fa71ac35.png"},
- {name:"医師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/a3f1d900-e3cd-4e6b-a90b-eb43c9dd2028.png"},
- {name:"泥棒", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ca2d83e8-5db7-48ff-b37a-93fc8892ec92.png"},
- {name:"マジシャン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/14013394-0e57-4e05-9285-2941947ab130.png"},
- {name:"冒険家", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/4f9d0387-b76a-463e-9f65-b945f09411d1.png"},
- {name:"傭兵", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2044a9e1-bb83-42b1-bcae-2a936993ba4b.png"},
- {name:"空軍", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0e0f71f8-5a1b-470c-92ee-a6284b2f692c.png"},
- {name:"祭司", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2b83d106-d8c5-4044-9fb7-a73da81ba88f.png"},
- {name:"機械技師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/b632b106-9927-47a2-b51c-8a71e7221d9f.png"},
- {name:"オフェンス", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/df12466f-2a72-4993-ba4c-569cc18d25c5.png"},
- {name:"心眼", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/3016ecc5-a511-475d-a71e-8673f4eb05d6.png"},
- {name:"調香師", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/80027721-84b3-4a4b-a37f-65c9544f638d.png"},
- {name:"カウボーイ", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/abb961f5-df1f-4910-a84d-7aa862d29307.png"},
- {name:"踊り子", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0917da74-16f3-4fd1-8587-34c6eb9bdc3b.png"},
- {name:"占い師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/441c7049-65c8-4bf9-983d-b9c768a0c6c7.png"},
- {name:"納棺師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2ea34c7b-5d0e-4adc-9594-4eee266db57d.png"},
- {name:"探鉱者", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/588ef287-7357-4604-adcd-fe0487038dae.png"},
- {name:"呪術師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/38938c20-7008-4753-bc7b-fc18cc14d806.png"},
- {name:"野人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/10ef9a42-b1d3-44db-a707-6598f4a7f55f.png"},
- {name:"曲芸師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/55e29549-3311-4b24-9676-a7e915e4c08e.png"},
- {name:"一等航海士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0e70772a-5324-4663-8fc4-fc0c597206f0.png"},
- {name:"バーメイド", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/454fd2c1-df90-4612-8cc4-da7643f3d9bd.png"},
- {name:"ポストマン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/5cf4fd28-241e-4754-a0df-0491a83cae01.png"},
- {name:"墓守", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/6960a563-ce7d-4e45-bc10-774b06fe180a.png"},
- {name:"囚人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/208f4b4c-03c6-4d12-ab00-c1fc1e13037f.png"},
- {name:"昆虫学者", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/741cab16-7a25-4c1d-8e5c-9f7f4d296189.png"},
- {name:"画家", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/926f8543-5a3d-46a9-8d7f-71c19132fcf1.png"},
- {name:"バッツマン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/14f5e23b-28c5-4800-9e54-ec2bb5331f4c.png"},
- {name:"玩具職人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/13cb7a1c-3ed8-47c2-9c9c-386073c539fb.png"},
- {name:"患者", type:"survivor", img:"https://r.res.easebar.com/pic/20211012/493b5733-1feb-44e2-a62e-98d052079908.png"},
- {name:"心理学者", type:"survivor", img:"https://r.res.easebar.com/pic/20211012/47e56f50-baf6-4478-b751-78609377cc66.png"},
- {name:"小説家", type:"survivor", img:"https://r.res.easebar.com/pic/20211227/e427402f-118e-4257-9c73-cdd4d93d5989.png"},
- {name:"少女", type:"survivor", img:"https://r.res.easebar.com/pic/20211227/e6a7caf5-e788-4c83-818e-9f40c98580b1.png"},
- {name:"泣きピエロ", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/d887703e-6061-4142-aa54-cafac7f4758d.png"},
- {name:"教授", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/ee787a6d-adfb-4725-af34-ff26dfd52cd5.png"},
- {name:"骨董商", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/70033254-d887-43a7-b16d-7823e5a2f9ee.png"},
- {name:"作曲家", type:"survivor", img:"https://r.res.easebar.com/pic/20221201/34f5b368-d736-412d-af52-8c3fa3499390.png"},
- {name:"記者", type:"survivor", img:"https://r.res.easebar.com/pic/20230621/cf00966b-446e-4c63-8da6-62fea26d1e59.png"},
- {name:"航空エンジニア", type:"survivor", img:"https://r.res.easebar.com/pic/20230719/294a1bec-a8d3-4f87-99a6-bb27f5ff0989.png"},
- {name:"応援団", type:"survivor", img:"https://r.res.easebar.com/pic/20230830/1ef2acaf-bf0b-4a9d-9fa5-93c56f304041.png"},
- {name:"人形師", type:"survivor", img:"https://r.res.easebar.com/pic/20240118/db8e6091-86fd-4515-a02e-697e873069e8.png"},
- {name:"火災調査員", type:"survivor", img:"https://r.res.easebar.com/pic/20240410/930c0b1b-4d72-493c-881d-d322882ba5fa.png"},
- {name:"レディ・ファウロ", type:"survivor", img:"https://r.res.easebar.com/pic/20240603/4565ba16-bd59-4d8e-99e9-90a7fbc351c5.png"},
- {name:"騎士", type:"survivor", img:"https://r.res.easebar.com/pic/20241017/ac50d4b2-c54f-4d8d-baae-442a2442417b.png"},
- {name:"気象学者", type:"survivor", img:"https://r.res.easebar.com/pic/20250114/2ce23333-a69a-423d-bedf-932da3e6c5f6.png"},
- {name:"弓使い", type:"survivor", img:"https://r.res.easebar.com/pic/20250217/fdfb89ca-ffa1-4945-b5a8-c523433a243e.png"},
- {name:"脱出マスター", type:"survivor", img:"https://r.res.easebar.com/pic/20250522/b7c5a3b3-6a0d-4b93-bf4a-e9a880cc318f.png"},
- {name:"幻灯師", type:"survivor", img:"https://r.res.easebar.com/pic/20250922/ec7ba79a-7d33-4970-9667-1cf13771931f.png"},
- {name:"闘牛士", type:"survivor", img:"https://r.res.easebar.com/pic/20260123/90c5e223-d8d3-42b2-8a20-c95a2a431804.png"},
- {name:"マイムアーティスト", type:"survivor", img:"https://r.res.easebar.com/pic/20260605/b2f56ce0-cfe5-45b6-9802-02e2c8ec3fef.png"},
- {name:"幸運児", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/92d9dfcb-1469-440b-89d4-17058642f8b8.png"},
+  {name:"庭師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ed0150f9-e1f7-4d3e-9428-c08b253a6316.png"},
+  {name:"弁護士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/1270f6b8-18d5-4dc5-9351-89e5fa71ac35.png"},
+  {name:"医師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/a3f1d900-e3cd-4e6b-a90b-eb43c9dd2028.png"},
+  {name:"泥棒", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ca2d83e8-5db7-48ff-b37a-93fc8892ec92.png"},
+  {name:"マジシャン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/14013394-0e57-4e05-9285-2941947ab130.png"},
+  {name:"冒険家", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/4f9d0387-b76a-463e-9f65-b945f09411d1.png"},
+  {name:"傭兵", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2044a9e1-bb83-42b1-bcae-2a936993ba4b.png"},
+  {name:"空軍", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0e0f71f8-5a1b-470c-92ee-a6284b2f692c.png"},
+  {name:"祭司", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2b83d106-d8c5-4044-9fb7-a73da81ba88f.png"},
+  {name:"機械技師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/b632b106-9927-47a2-b51c-8a71e7221d9f.png"},
+  {name:"オフェンス", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/df12466f-2a72-4993-ba4c-569cc18d25c5.png"},
+  {name:"心眼", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/3016ecc5-a511-475d-a71e-8673f4eb05d6.png"},
+  {name:"調香師", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/80027721-84b3-4a4b-a37f-65c9544f638d.png"},
+  {name:"カウボーイ", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/abb961f5-df1f-4910-a84d-7aa862d29307.png"},
+  {name:"踊り子", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0917da74-16f3-4fd1-8587-34c6eb9bdc3b.png"},
+  {name:"占い師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/441c7049-65c8-4bf9-983d-b9c768a0c6c7.png"},
+  {name:"納棺師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/2ea34c7b-5d0e-4adc-9594-4eee266db57d.png"},
+  {name:"探鉱者", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/588ef287-7357-4604-adcd-fe0487038dae.png"},
+  {name:"呪術師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/38938c20-7008-4753-bc7b-fc18cc14d806.png"},
+  {name:"野人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/10ef9a42-b1d3-44db-a707-6598f4a7f55f.png"},
+  {name:"曲芸師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/55e29549-3311-4b24-9676-a7e915e4c08e.png"},
+  {name:"一等航海士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/0e70772a-5324-4663-8fc4-fc0c597206f0.png"},
+  {name:"バーメイド", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/454fd2c1-df90-4612-8cc4-da7643f3d9bd.png"},
+  {name:"ポストマン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/5cf4fd28-241e-4754-a0df-0491a83cae01.png"},
+  {name:"墓守", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/6960a563-ce7d-4e45-bc10-774b06fe180a.png"},
+  {name:"囚人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/208f4b4c-03c6-4d12-ab00-c1fc1e13037f.png"},
+  {name:"昆虫学者", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/741cab16-7a25-4c1d-8e5c-9f7f4d296189.png"},
+  {name:"画家", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/926f8543-5a3d-46a9-8d7f-71c19132fcf1.png"},
+  {name:"バッツマン", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/14f5e23b-28c5-4800-9e54-ec2bb5331f4c.png"},
+  {name:"玩具職人", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/13cb7a1c-3ed8-47c2-9c9c-386073c539fb.png"},
+  {name:"患者", type:"survivor", img:"https://r.res.easebar.com/pic/20211012/493b5733-1feb-44e2-a62e-98d052079908.png"},
+  {name:"心理学者", type:"survivor", img:"https://r.res.easebar.com/pic/20211012/47e56f50-baf6-4478-b751-78609377cc66.png"},
+  {name:"小説家", type:"survivor", img:"https://r.res.easebar.com/pic/20211227/e427402f-118e-4257-9c73-cdd4d93d5989.png"},
+  {name:"少女", type:"survivor", img:"https://r.res.easebar.com/pic/20211227/e6a7caf5-e788-4c83-818e-9f40c98580b1.png"},
+  {name:"泣きピエロ", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/d887703e-6061-4142-aa54-cafac7f4758d.png"},
+  {name:"教授", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/ee787a6d-adfb-4725-af34-ff26dfd52cd5.png"},
+  {name:"骨董商", type:"survivor", img:"https://r.res.easebar.com/pic/20220805/70033254-d887-43a7-b16d-7823e5a2f9ee.png"},
+  {name:"作曲家", type:"survivor", img:"https://r.res.easebar.com/pic/20221201/34f5b368-d736-412d-af52-8c3fa3499390.png"},
+  {name:"記者", type:"survivor", img:"https://r.res.easebar.com/pic/20230621/cf00966b-446e-4c63-8da6-62fea26d1e59.png"},
+  {name:"航空エンジニア", type:"survivor", img:"https://r.res.easebar.com/pic/20230719/294a1bec-a8d3-4f87-99a6-bb27f5ff0989.png"},
+  {name:"応援団", type:"survivor", img:"https://r.res.easebar.com/pic/20230830/1ef2acaf-bf0b-4a9d-9fa5-93c56f304041.png"},
+  {name:"人形師", type:"survivor", img:"https://r.res.easebar.com/pic/20240118/db8e6091-86fd-4515-a02e-697e873069e8.png"},
+  {name:"火災調査員", type:"survivor", img:"https://r.res.easebar.com/pic/20240410/930c0b1b-4d72-493c-881d-d322882ba5fa.png"},
+  {name:"レディ・ファウロ", type:"survivor", img:"https://r.res.easebar.com/pic/20240603/4565ba16-bd59-4d8e-99e9-90a7fbc351c5.png"},
+  {name:"騎士", type:"survivor", img:"https://r.res.easebar.com/pic/20241017/ac50d4b2-c54f-4d8d-baae-442a2442417b.png"},
+  {name:"気象学者", type:"survivor", img:"https://r.res.easebar.com/pic/20250114/2ce23333-a69a-423d-bedf-932da3e6c5f6.png"},
+  {name:"弓使い", type:"survivor", img:"https://r.res.easebar.com/pic/20250217/fdfb89ca-ffa1-4945-b5a8-c523433a243e.png"},
+  {name:"脱出マスター", type:"survivor", img:"https://r.res.easebar.com/pic/20250522/b7c5a3b3-6a0d-4b93-bf4a-e9a880cc318f.png"},
+  {name:"幻灯師", type:"survivor", img:"https://r.res.easebar.com/pic/20250922/ec7ba79a-7d33-4970-9667-1cf13771931f.png"},
+  {name:"闘牛士", type:"survivor", img:"https://r.res.easebar.com/pic/20260123/90c5e223-d8d3-42b2-8a20-c95a2a431804.png"},
+  {name:"マイムアーティスト", type:"survivor", img:"https://r.res.easebar.com/pic/20260605/b2f56ce0-cfe5-45b6-9802-02e2c8ec3fef.png"},
+  {name:"幸運児", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/92d9dfcb-1469-440b-89d4-17058642f8b8.png"},
 
- {name:"復讐者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3d0ad699-d7d1-4435-b748-767de0e163ab.png"},
- {name:"道化師", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/af80f4b6-ff5d-4d96-a4e5-b2d0bffe583e.png"},
- {name:"断罪狩人", type:"hunter", img:"https://r.res.easebar.com/pic/20210722/13828e4f-59b4-4f8b-9301-ccbd0972e1f3.png"},
- {name:"リッパー", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/5497873e-1110-4db2-9c78-6eed7ebe317a.png"},
- {name:"結魂者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/6f01b221-db26-4e5b-8358-091e117b02c7.png"},
- {name:"芸者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/d4955168-3a5b-4255-8db3-49684838f40b.png"},
- {name:"白黒無常", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2213f5c6-95dc-4a95-9e81-25c3953456d8.png"},
- {name:"写真家", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/9094b776-8560-43ac-ab70-8403d9529ac1.png"},
- {name:"狂眼", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3ef0468e-e39f-4396-808b-0b5b55be3218.png"},
- {name:"黄衣の王", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/5e1b1cfb-f700-4955-82ee-5360b62cff37.png"},
- {name:"夢の魔女", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/abb970f8-e246-41f7-a60b-ee43b540f176.png"},
- {name:"泣き虫", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/e1f886dd-353a-4390-a98e-0d46acc43503.png"},
- {name:"魔トカゲ", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2a3f91d5-d8b3-48f8-b33f-53e3fb9d4f6a.png"},
- {name:"血の女王", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/81ebbfc4-8d89-4e97-a536-58ab709f475d.png"},
- {name:"ガードNo.26", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2fb9acc0-8c03-4ce4-88ff-72b6f9db1c02.png"},
- {name:"使徒", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/a3e00872-8c52-4de9-83c9-a24e4f434e39.png"},
- {name:"ヴァイオリニスト", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/654154a2-7daf-46e6-9454-8b32deb1cbb5.png"},
- {name:"彫刻師", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/55f167cc-691d-44c3-8fc7-f0371481ca32.png"},
- {name:"アンデッド", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/db3890b1-4fbe-4661-8936-8e67a4d901c9.png"},
- {name:"破輪", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3f716772-20ab-4e07-a4e3-99170b4d839d.png"},
- {name:"漁師", type:"hunter", img:"https://r.res.easebar.com/pic/20210623/2b556fb2-0e81-4156-a459-c90420a8c006.png"},
- {name:"蝋人形師", type:"hunter", img:"https://r.res.easebar.com/pic/20211012/34c8ba29-4b43-4318-8ff8-aa2e92b3e980.png"},
- {name:"悪夢", type:"hunter", img:"https://r.res.easebar.com/pic/20211227/06838cc9-6897-4411-a2bb-d257fdb31f87.png"},
- {name:"書記官", type:"hunter", img:"https://r.res.easebar.com/pic/20220805/d119dc32-2c94-46e7-b58f-27eca9d141d2.png"},
- {name:"隠者", type:"hunter", img:"https://r.res.easebar.com/pic/20220815/7fdb7a3b-70e4-4a5b-b5e6-1ba6ea5f16d7.png"},
- {name:"夜の番人", type:"hunter", img:"https://r.res.easebar.com/pic/20230621/da78f6cb-0842-4a23-9073-cb568766fad4.png"},
- {name:"オペラ歌手", type:"hunter", img:"https://r.res.easebar.com/pic/20230621/439a25b4-61b2-4d58-a1df-e7ad0c39838b.png"},
- {name:"フールズ・ゴールド", type:"hunter", img:"https://r.res.easebar.com/pic/20231016/04355008-7b72-4985-88ea-d00ffed29959.png"},
- {name:"時空の影", type:"hunter", img:"https://r.res.easebar.com/pic/20240301/60f7d024-e2bf-4693-b566-178c93400e1a.png"},
- {name:"足萎えの羊", type:"hunter", img:"https://r.res.easebar.com/pic/20240806/ecae5d21-7b21-4cdd-b2f0-68f0ba5ea51d.png"},
- {name:"フラバルー", type:"hunter", img:"https://r.res.easebar.com/pic/20241203/128aed4f-265e-41a2-b1d4-836569a45a12.png"},
- {name:"雑貨商", type:"hunter", img:"https://r.res.easebar.com/pic/20250408/dd6fc95f-b8d6-4227-a66a-0064d950fe8c.png"},
- {name:"ビリヤードプレイヤー", type:"hunter", img:"https://r.res.easebar.com/pic/20250813/d98337fb-43c9-486e-b0c1-c84377966432.png"},
- {name:"女王蜂", type:"hunter", img:"https://r.res.easebar.com/pic/20251111/32a36239-8f28-44ae-9071-cf9bd816a5d0.png"},
- {name:"歯医者", type:"hunter", img:"https://r.res.easebar.com/pic/20260518/6915da4e-28c3-4c1b-8329-b81bd4d37aea.png"}
+  {name:"復讐者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3d0ad699-d7d1-4435-b748-767de0e163ab.png"},
+  {name:"道化師", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/af80f4b6-ff5d-4d96-a4e5-b2d0bffe583e.png"},
+  {name:"断罪狩人", type:"hunter", img:"https://r.res.easebar.com/pic/20210722/13828e4f-59b4-4f8b-9301-ccbd0972e1f3.png"},
+  {name:"リッパー", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/5497873e-1110-4db2-9c78-6eed7ebe317a.png"},
+  {name:"結魂者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/6f01b221-db26-4e5b-8358-091e117b02c7.png"},
+  {name:"芸者", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/d4955168-3a5b-4255-8db3-49684838f40b.png"},
+  {name:"白黒無常", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2213f5c6-95dc-4a95-9e81-25c3953456d8.png"},
+  {name:"写真家", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/9094b776-8560-43ac-ab70-8403d9529ac1.png"},
+  {name:"狂眼", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3ef0468e-e39f-4396-808b-0b5b55be3218.png"},
+  {name:"黄衣の王", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/5e1b1cfb-f700-4955-82ee-5360b62cff37.png"},
+  {name:"夢の魔女", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/abb970f8-e246-41f7-a60b-ee43b540f176.png"},
+  {name:"泣き虫", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/e1f886dd-353a-4390-a98e-0d46acc43503.png"},
+  {name:"魔トカゲ", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2a3f91d5-d8b3-48f8-b33f-53e3fb9d4f6a.png"},
+  {name:"血の女王", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/81ebbfc4-8d89-4e97-a536-58ab709f475d.png"},
+  {name:"ガードNo.26", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/2fb9acc0-8c03-4ce4-88ff-72b6f9db1c02.png"},
+  {name:"使徒", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/a3e00872-8c52-4de9-83c9-a24e4f434e39.png"},
+  {name:"ヴァイオリニスト", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/654154a2-7daf-46e6-9454-8b32deb1cbb5.png"},
+  {name:"彫刻師", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/55f167cc-691d-44c3-8fc7-f0371481ca32.png"},
+  {name:"アンデッド", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/db3890b1-4fbe-4661-8936-8e67a4d901c9.png"},
+  {name:"破輪", type:"hunter", img:"https://r.res.easebar.com/pic/20210618/3f716772-20ab-4e07-a4e3-99170b4d839d.png"},
+  {name:"漁師", type:"hunter", img:"https://r.res.easebar.com/pic/20210623/2b556fb2-0e81-4156-a459-c90420a8c006.png"},
+  {name:"蝋人形師", type:"hunter", img:"https://r.res.easebar.com/pic/20211012/34c8ba29-4b43-4318-8ff8-aa2e92b3e980.png"},
+  {name:"悪夢", type:"hunter", img:"https://r.res.easebar.com/pic/20211227/06838cc9-6897-4411-a2bb-d257fdb31f87.png"},
+  {name:"書記官", type:"hunter", img:"https://r.res.easebar.com/pic/20220805/d119dc32-2c94-46e7-b58f-27eca9d141d2.png"},
+  {name:"隠者", type:"hunter", img:"https://r.res.easebar.com/pic/20220815/7fdb7a3b-70e4-4a5b-b5e6-1ba6ea5f16d7.png"},
+  {name:"夜の番人", type:"hunter", img:"https://r.res.easebar.com/pic/20230621/da78f6cb-0842-4a23-9073-cb568766fad4.png"},
+  {name:"オペラ歌手", type:"hunter", img:"https://r.res.easebar.com/pic/20230621/439a25b4-61b2-4d58-a1df-e7ad0c39838b.png"},
+  {name:"フールズ・ゴールド", type:"hunter", img:"https://r.res.easebar.com/pic/20231016/04355008-7b72-4985-88ea-d00ffed29959.png"},
+  {name:"時空の影", type:"hunter", img:"https://r.res.easebar.com/pic/20240301/60f7d024-e2bf-4693-b566-178c93400e1a.png"},
+  {name:"足萎えの羊", type:"hunter", img:"https://r.res.easebar.com/pic/20240806/ecae5d21-7b21-4cdd-b2f0-68f0ba5ea51d.png"},
+  {name:"フラバルー", type:"hunter", img:"https://r.res.easebar.com/pic/20241203/128aed4f-265e-41a2-b1d4-836569a45a12.png"},
+  {name:"雑貨商", type:"hunter", img:"https://r.res.easebar.com/pic/20250408/dd6fc95f-b8d6-4227-a66a-0064d950fe8c.png"},
+  {name:"ビリヤードプレイヤー", type:"hunter", img:"https://r.res.easebar.com/pic/20250813/d98337fb-43c9-486e-b0c1-c84377966432.png"},
+  {name:"女王蜂", type:"hunter", img:"https://r.res.easebar.com/pic/20251111/32a36239-8f28-44ae-9071-cf9bd816a5d0.png"},
+  {name:"歯医者", type:"hunter", img:"https://r.res.easebar.com/pic/20260518/6915da4e-28c3-4c1b-8329-b81bd4d37aea.png"}
 ];
- 
+  
 const maps = [
- {name: "軍需工場", img: "https://gorzmonst.github.io/identity_v_pick/images/Arms_Factory.webp"},
- {name: "赤の教会", img: "https://gorzmonst.github.io/identity_v_pick/images/The_Red_Church.webp"},
- {name: "聖心病院", img: "https://gorzmonst.github.io/identity_v_pick/images/Sacred_Heart_Hospital.webp"},
- {name: "湖景村", img: "https://gorzmonst.github.io/identity_v_pick/images/Lakeside_Village.webp"},
- {name: "月の河公園", img: "https://gorzmonst.github.io/identity_v_pick/images/Moonlit_River_Park.webp"},
- {name: "レオの思い出", img: "https://gorzmonst.github.io/identity_v_pick/images/Leo's_Memory.webp"},
- {name: "永眠町", img: "https://gorzmonst.github.io/identity_v_pick/images/Eversleeping_Town.webp"},
- {name: "中華街", img: "https://gorzmonst.github.io/identity_v_pick/images/Chinatown.webp"},
- {name: "罪の森", img: "https://gorzmonst.github.io/identity_v_pick/images/Darkwoods.webp"}
+  {name: "軍需工場", img: "https://gorzmonst.github.io/identity_v_pick/images/Arms_Factory.webp"},
+  {name: "赤の教会", img: "https://gorzmonst.github.io/identity_v_pick/images/The_Red_Church.webp"},
+  {name: "聖心病院", img: "https://gorzmonst.github.io/identity_v_pick/images/Sacred_Heart_Hospital.webp"},
+  {name: "湖景村", img: "https://gorzmonst.github.io/identity_v_pick/images/Lakeside_Village.webp"},
+  {name: "月の河公園", img: "https://gorzmonst.github.io/identity_v_pick/images/Moonlit_River_Park.webp"},
+  {name: "レオの思い出", img: "https://gorzmonst.github.io/identity_v_pick/images/Leo's_Memory.webp"},
+  {name: "永眠町", img: "https://gorzmonst.github.io/identity_v_pick/images/Eversleeping_Town.webp"},
+  {name: "中華街", img: "https://gorzmonst.github.io/identity_v_pick/images/Chinatown.webp"},
+  {name: "罪の森", img: "https://gorzmonst.github.io/identity_v_pick/images/Darkwoods.webp"}
 ];
 
 const bannedNames = new Set();
 const usedMaps = new Set();
 let currentMode = "BO3";
 let currentRound = "R1";
-let dragged Char = null;
+let draggedChar = null;
 
 const ROUND_CONFIG = {
- BO3: ["R1", "R2", "R3", "延長"],
- BO5: ["R1", "R2", "R3", "R4", "R5", "延長"]
+  BO3: ["R1", "R2", "R3", "延長"],
+  BO5: ["R1", "R2", "R3", "R4", "R5", "延長"]
 };
 
 const STORAGE_KEY = "idv-pick-state";
 
 function getBanCounts(round) {
- if (round === "R1") return { teamA: 0, teamB: 4 };
- if (round === "R2") return { teamA: 1, teamB: 4 };
- return { teamA: 2, teamB: 4 };
+  if (round === "R1") return { teamA: 0, teamB: 4 };
+  if (round === "R2") return { teamA: 1, teamB: 4 };
+  return { teamA: 2, teamB: 4 };
 }
 
 function getAllSlotIds() {
- const ids = ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"];
- ROUND_CONFIG[currentMode].forEach(r => {
- ids.push(`global-surv-used-${r}`);
- ids.push(`global-surv-ban-${r}`);
- ids.push(`global-hunt-used-${r}`);
- ids.push(`global-hunt-ban-${r}`);
- });
- return ids;
+  const ids = ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"];
+  ROUND_CONFIG[currentMode].forEach(r => {
+    ids.push(`global-surv-used-${r}`);
+    ids.push(`global-surv-ban-${r}`);
+    ids.push(`global-hunt-used-${r}`);
+    ids.push(`global-hunt-ban-${r}`);
+  });
+  return ids;
 }
 
 function saveState() {
- const state = {
- mode: currentMode,
- round: currentRound,
- teamAName: document.querySelector(".team-a .team-name").textContent,
- teamBName: document.querySelector(".team-b .team-name").textContent,
- slots: {},
- maps: {}
- };
- getAllSlotIds().forEach(id => {
- const el = document.getElementById(id);
- if (el) state.slots[id] = [...el.querySelectorAll(".char")].map(c => c.dataset.name);
- });
- ROUND_CONFIG[currentMode].forEach(r => {
- const sel = document.getElementById(`map-select-${r}`);
- if (sel) state.maps[r] = sel.value;
- });
- localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const state = {
+    mode: currentMode,
+    round: currentRound,
+    teamAName: document.querySelector(".team-a .team-name").textContent,
+    teamBName: document.querySelector(".team-b .team-name").textContent,
+    slots: {},
+    maps: {}
+  };
+  getAllSlotIds().forEach(id => {
+    const el = document.getElementById(id);
+    if (el) state.slots[id] = [...el.querySelectorAll(".char")].map(c => c.dataset.name);
+  });
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (sel) state.maps[r] = sel.value;
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
 function loadState() {
- const raw = localStorage.getItem(STORAGE_KEY);
- if (!raw) return;
- try {
- const state = JSON.parse(raw);
- if (state.mode) setMode(state.mode);
- if (state.round) setCurrentRound(state.round);
- if (state.teamAName) document.querySelector(".team-a .team-name").textContent = state.teamAName;
- if (state.teamBName) document.querySelector(".team-b .team-name").textContent = state.teamBName;
- if (state.slots) {
- Object.entries(state.slots).forEach(([id, names]) => {
- const container = document.getElementById(id);
- if (!container) return;
- const slots = container.querySelectorAll(".slot");
- names.forEach((name, i) => {
- if (i >= slots.length) return;
- const charData = characters.find(c => c.name === name);
- if (charData) {
- slots[i].innerHTML = "";
- slots[i].appendChild(createCharElement(charData));
- addClearButton(slots[i]);
- }
- });
- });
- }
- if (state.maps) {
- Object.entries(state.maps).forEach(([r, val]) => {
- const sel = document.getElementById(`map-select-${r}`);
- if (sel) sel.value = val || "";
- });
- }
- updateUsedMaps();
- renderMapsDisplay();
- updateBanned();
- checkCompleteButton();
- } catch (e) {
- console.warn("ピック情報の復元に失敗", e);
- }
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    if (state.mode) setMode(state.mode);
+    if (state.round) setCurrentRound(state.round);
+    if (state.teamAName) document.querySelector(".team-a .team-name").textContent = state.teamAName;
+    if (state.teamBName) document.querySelector(".team-b .team-name").textContent = state.teamBName;
+    if (state.slots) {
+      Object.entries(state.slots).forEach(([id, names]) => {
+        const container = document.getElementById(id);
+        if (!container) return;
+        const slots = container.querySelectorAll(".slot");
+        names.forEach((name, i) => {
+          if (i >= slots.length) return;
+          const charData = characters.find(c => c.name === name);
+          if (charData) {
+            slots[i].innerHTML = "";
+            slots[i].appendChild(createCharElement(charData));
+            addClearButton(slots[i]);
+          }
+        });
+      });
+    }
+    if (state.maps) {
+      Object.entries(state.maps).forEach(([r, val]) => {
+        const sel = document.getElementById(`map-select-${r}`);
+        if (sel) sel.value = val || "";
+      });
+    }
+    updateUsedMaps();
+    renderMapsDisplay();
+    updateBanned();
+    checkCompleteButton();
+  } catch (e) {
+    console.warn("ピック情報の復元に失敗", e);
+  }
 }
 
 function addClearButton(slot) {
- const existing = slot.querySelector(".clear-btn");
- if (existing) existing.remove();
- if (!slot.querySelector(".char")) return;
- const btn = document.createElement("button");
- btn.className = "clear-btn";
- btn.innerHTML = "×";
- btn.title = "この枠を空にする";
- btn.onclick = (e) => {
- e.stopPropagation();
- slot.innerHTML = "";
- updateBanned();
- checkCompleteButton();
- saveState();
- };
- slot.appendChild(btn);
+  const existing = slot.querySelector(".clear-btn");
+  if (existing) existing.remove();
+  if (!slot.querySelector(".char")) return;
+  const btn = document.createElement("button");
+  btn.className = "clear-btn";
+  btn.innerHTML = "×";
+  btn.title = "この枠を空にする";
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    slot.innerHTML = "";
+    updateBanned();
+    checkCompleteButton();
+    saveState();
+  };
+  slot.appendChild(btn);
 }
 
 function createCharElement(data, isPool = false) {
- const div = document.createElement("div");
- div.className = `char ${data.type}` + (data.img ? "" : " no-img");
- if (isPool && bannedNames.has(data.name)) div.classList.add("banned");
- div.draggable = true;
- div.dataset.name = data.name;
- div.dataset.type = data.type;
- div.dataset.img = data.img || "";
- if (data.img) {
- const img = document.createElement("img");
- img.src = data.img;
- img.alt = data.name;
- img.onerror = () => {
- div.classList.add("no-img");
- div.innerHTML = "";
- const ns = document.createElement("div");
- ns.className = "name";
- ns.textContent = data.name;
- div.appendChild(ns);
- };
- div.appendChild(img);
- }
- const nameSpan = document.createElement("div");
- nameSpan.className = "name";
- nameSpan.textContent = data.name;
- div.appendChild(nameSpan);
- div.addEventListener("dragstart", e => {
- e.dataTransfer.setData("text/plain", JSON.stringify({
- name: data.name, type: data.type, img: data.img || ""
- }));
- draggedChar = div;
- div.classList.add("dragging");
- });
- div.addEventListener("dragend", () => {
- div.classList.remove("dragging");
- draggedChar = null;
- });
- return div;
+  const div = document.createElement("div");
+  div.className = `char ${data.type}` + (data.img ? "" : " no-img");
+  if (isPool && bannedNames.has(data.name)) div.classList.add("banned");
+  div.draggable = true;
+  div.dataset.name = data.name;
+  div.dataset.type = data.type;
+  div.dataset.img = data.img || "";
+  if (data.img) {
+    const img = document.createElement("img");
+    img.src = data.img;
+    img.alt = data.name;
+    img.onerror = () => {
+      div.classList.add("no-img");
+      div.innerHTML = "";
+      const ns = document.createElement("div");
+      ns.className = "name";
+      ns.textContent = data.name;
+      div.appendChild(ns);
+    };
+    div.appendChild(img);
+  }
+  const nameSpan = document.createElement("div");
+  nameSpan.className = "name";
+  nameSpan.textContent = data.name;
+  div.appendChild(nameSpan);
+  div.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", JSON.stringify({
+      name: data.name, type: data.type, img: data.img || ""
+    }));
+    draggedChar = div;
+    div.classList.add("dragging");
+  });
+  div.addEventListener("dragend", () => {
+    div.classList.remove("dragging");
+    draggedChar = null;
+  });
+  return div;
 }
 
 function makeDroppable(slot, allowedType) {
- slot.dataset.allowed = allowedType;
- slot.addEventListener("dragover", e => {
- e.preventDefault();
- slot.classList.add("over");
- });
- slot.addEventListener("dragleave", () => {
- slot.classList.remove("over");
- slot.classList.remove("reject");
- });
- slot.addEventListener("drop", e => {
- e.preventDefault();
- slot.classList.remove("over");
- slot.classList.remove("reject");
- let data;
- try {
- data = JSON.parse(e.dataTransfer.getData("text/plain"));
- } catch { return; }
- if (data.type !== allowedType) {
- slot.classList.add("reject");
- setTimeout(() => slot.classList.remove("reject"), 450);
- return;
- }
- const isMovingFromSlot = draggedChar && draggedChar.closest(".slot");
- if (bannedNames.has(data.name) && !isMovingFromSlot) {
- slot.classList.add("reject");
- setTimeout(() => slot.classList.remove("reject"), 450);
- return;
- }
- const sourceSlot = draggedChar ? draggedChar.closest(".slot") : null;
- slot.innerHTML = "";
- slot.appendChild(createCharElement(data));
- addClearButton(slot);
- if (sourceSlot && sourceSlot !== slot) sourceSlot.innerHTML = "";
- updateBanned();
- checkCompleteButton();
- saveState();
- });
+  slot.dataset.allowed = allowedType;
+  slot.addEventListener("dragover", e => {
+    e.preventDefault();
+    slot.classList.add("over");
+  });
+  slot.addEventListener("dragleave", () => {
+    slot.classList.remove("over");
+    slot.classList.remove("reject");
+  });
+  slot.addEventListener("drop", e => {
+    e.preventDefault();
+    slot.classList.remove("over");
+    slot.classList.remove("reject");
+    let data;
+    try {
+      data = JSON.parse(e.dataTransfer.getData("text/plain"));
+    } catch { return; }
+    if (data.type !== allowedType) {
+      slot.classList.add("reject");
+      setTimeout(() => slot.classList.remove("reject"), 450);
+      return;
+    }
+    const isMovingFromSlot = draggedChar && draggedChar.closest(".slot");
+    if (bannedNames.has(data.name) && !isMovingFromSlot) {
+      slot.classList.add("reject");
+      setTimeout(() => slot.classList.remove("reject"), 450);
+      return;
+    }
+    const sourceSlot = draggedChar ? draggedChar.closest(".slot") : null;
+    slot.innerHTML = "";
+    slot.appendChild(createCharElement(data));
+    addClearButton(slot);
+    if (sourceSlot && sourceSlot !== slot) sourceSlot.innerHTML = "";
+    updateBanned();
+    checkCompleteButton();
+    saveState();
+  });
 }
 
 function createSlotsInContainer(container, count, cssType, allowedType) {
- container.innerHTML = "";
- for (let i = 0; i < count; i++) {
- const slot = document.createElement("div");
- slot.className = `slot ${cssType}`;
- makeDroppable(slot, allowedType);
- container.appendChild(slot);
- }
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const slot = document.createElement("div");
+    slot.className = `slot ${cssType}`;
+    makeDroppable(slot, allowedType);
+    container.appendChild(slot);
+  }
 }
 
 function buildGlobalRounds() {
- const survC = document.getElementById("global-surv-rounds");
- const huntC = document.getElementById("global-hunt-rounds");
- survC.innerHTML = "";
- huntC.innerHTML = "";
- ROUND_CONFIG[currentMode].forEach(r => {
- const counts = getBanCounts(r);
+  const survC = document.getElementById("global-surv-rounds");
+  const huntC = document.getElementById("global-hunt-rounds");
+  survC.innerHTML = "";
+  huntC.innerHTML = "";
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const counts = getBanCounts(r);
 
- // サバイバー側
- const sBlock = document.createElement("div");
- sBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
- sBlock.dataset.round = r;
- const sContent = document.createElement("div");
- sContent.className = "round-content";
- const sUsed = document.createElement("div");
- sUsed.className = "used-area";
- sUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
- const sUsedSlots = document.createElement("div");
- sUsedSlots.className = "slots";
- sUsedSlots.id = `global-surv-used-${r}`;
- sUsed.appendChild(sUsedSlots);
- const sBan = document.createElement("div");
- sBan.className = "ban-area";
- sBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
- const sBanSlots = document.createElement("div");
- sBanSlots.className = "slots";
- sBanSlots.id = `global-surv-ban-${r}`;
- sBan.appendChild(sBanSlots);
- sContent.appendChild(sUsed);
- sContent.appendChild(sBan);
- sBlock.appendChild(sContent);
+    // サバイバー側
+    const sBlock = document.createElement("div");
+    sBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
+    sBlock.dataset.round = r;
+    const sContent = document.createElement("div");
+    sContent.className = "round-content";
+    const sUsed = document.createElement("div");
+    sUsed.className = "used-area";
+    sUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
+    const sUsedSlots = document.createElement("div");
+    sUsedSlots.className = "slots";
+    sUsedSlots.id = `global-surv-used-${r}`;
+    sUsed.appendChild(sUsedSlots);
+    const sBan = document.createElement("div");
+    sBan.className = "ban-area";
+    sBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
+    const sBanSlots = document.createElement("div");
+    sBanSlots.className = "slots";
+    sBanSlots.id = `global-surv-ban-${r}`;
+    sBan.appendChild(sBanSlots);
+    sContent.appendChild(sUsed);
+    sContent.appendChild(sBan);
+    sBlock.appendChild(sContent);
 
- // ★マップ選択は削除（使用マップパネル側に移動）
- survC.appendChild(sBlock);
- createSlotsInContainer(sUsedSlots, 4, "pick", "survivor");
- createSlotsInContainer(sBanSlots, counts.teamA, "ban", "hunter");
+    survC.appendChild(sBlock);
+    createSlotsInContainer(sUsedSlots, 4, "pick", "survivor");
+    createSlotsInContainer(sBanSlots, counts.teamA, "ban", "hunter");
 
- // ハンター側
- const hBlock = document.createElement("div");
- hBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
- hBlock.dataset.round = r;
- const hContent = document.createElement("div");
- hContent.className = "round-content";
- const hUsed = document.createElement("div");
- hUsed.className = "used-area";
- hUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
- const hUsedSlots = document.createElement("div");
- hUsedSlots.className = "slots";
- hUsedSlots.id = `global-hunt-used-${r}`;
- hUsed.appendChild(hUsedSlots);
- const hBan = document.createElement("div");
- hBan.className = "ban-area";
- hBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
- const hBanSlots = document.createElement("div");
- hBanSlots.className = "slots";
- hBanSlots.id = `global-hunt-ban-${r}`;
- hBan.appendChild(hBanSlots);
- hContent.appendChild(hUsed);
- hContent.appendChild(hBan);
- hBlock.appendChild(hContent);
- huntC.appendChild(hBlock);
- createSlotsInContainer(hUsedSlots, 1, "pick", "hunter");
- createSlotsInContainer(hBanSlots, counts.teamB, "ban", "survivor");
- });
- updateBanned();
- updateUsedMaps();
- renderMapsDisplay();
+    // ハンター側
+    const hBlock = document.createElement("div");
+    hBlock.className = "round-block" + (r === currentRound ? " active-round" : "") + (r === "延長" ? " ot" : "");
+    hBlock.dataset.round = r;
+    const hContent = document.createElement("div");
+    hContent.className = "round-content";
+    const hUsed = document.createElement("div");
+    hUsed.className = "used-area";
+    hUsed.innerHTML = `<div class="area-label">${r} 使用</div>`;
+    const hUsedSlots = document.createElement("div");
+    hUsedSlots.className = "slots";
+    hUsedSlots.id = `global-hunt-used-${r}`;
+    hUsed.appendChild(hUsedSlots);
+    const hBan = document.createElement("div");
+    hBan.className = "ban-area";
+    hBan.innerHTML = `<div class="area-label">${r} BAN</div>`;
+    const hBanSlots = document.createElement("div");
+    hBanSlots.className = "slots";
+    hBanSlots.id = `global-hunt-ban-${r}`;
+    hBan.appendChild(hBanSlots);
+    hContent.appendChild(hUsed);
+    hContent.appendChild(hBan);
+    hBlock.appendChild(hContent);
+    huntC.appendChild(hBlock);
+    createSlotsInContainer(hUsedSlots, 1, "pick", "hunter");
+    createSlotsInContainer(hBanSlots, counts.teamB, "ban", "survivor");
+  });
+  updateBanned();
+  updateUsedMaps();
+  renderMapsDisplay();
 }
 
 function renderMapsDisplay() {
- // 現在の値を保存
- const currentMaps = {};
- ROUND_CONFIG[currentMode].forEach(r => {
- const sel = document.getElementById(`map-select-${r}`);
- if (sel) currentMaps[r] = sel.value;
- });
+  // 現在の値を保存
+  const currentMaps = {};
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (sel) currentMaps[r] = sel.value;
+  });
 
- // 1. グローバル左（全ラウンド）
- const globalContainer = document.getElementById("global-maps-display");
- globalContainer.innerHTML = "";
- ROUND_CONFIG[currentMode].forEach(r => {
- const mapName = currentMaps[r] || "";
- const mapData = maps.find(m => m.name === mapName);
+  // 1. グローバル左（全ラウンド）
+  const globalContainer = document.getElementById("global-maps-display");
+  globalContainer.innerHTML = "";
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const mapName = currentMaps[r] || "";
+    const mapData = maps.find(m => m.name === mapName);
 
- const card = document.createElement("div");
- card.className = "map-card-sm" + (mapName ? "" : " empty") + (r === currentRound ? " active-map" : "");
- card.dataset.round = r;
+    const card = document.createElement("div");
+    card.className = "map-card-sm" + (mapName ? "" : " empty") + (r === currentRound ? " active-map" : "");
+    card.dataset.round = r;
 
- if (mapName && mapData && mapData.img) {
- const img = document.createElement("img");
- img.src = mapData.img;
- img.alt = mapName;
- img.onerror = () => img.style.display = "none";
- card.appendChild(img);
- }
- const nameDiv = document.createElement("div");
- nameDiv.className = "map-name";
- nameDiv.textContent = mapName || "未選択";
- card.appendChild(nameDiv);
+    if (mapName && mapData && mapData.img) {
+      const img = document.createElement("img");
+      img.src = mapData.img;
+      img.alt = mapName;
+      img.onerror = () => img.style.display = "none";
+      card.appendChild(img);
+    }
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "map-name";
+    nameDiv.textContent = mapName || "未選択";
+    card.appendChild(nameDiv);
 
- const roundDiv = document.createElement("div");
- roundDiv.className = "map-round";
- roundDiv.textContent = r;
- card.appendChild(roundDiv);
+    const roundDiv = document.createElement("div");
+    roundDiv.className = "map-round";
+    roundDiv.textContent = r;
+    card.appendChild(roundDiv);
 
- // マップ選択をここに配置
- const mapSelect = document.createElement("select");
- mapSelect.className = "map-select";
- mapSelect.id = `map-select-${r}`;
- mapSelect.innerHTML = `<option value="">マップ未選択</option>`;
- maps.forEach(m => {
- const opt = document.createElement("option");
- opt.value = m.name;
- opt.textContent = m.name;
- mapSelect.appendChild(opt);
- });
- mapSelect.value = mapName;
- // 重複マップを無効化
- [...mapSelect.options].forEach(opt => {
- if (opt.value === "") return;
- opt.disabled = usedMaps.has(opt.value) && opt.value !== mapName;
- });
- mapSelect.addEventListener("change", () => {
- updateUsedMaps();
- renderMapsDisplay();
- saveState();
- });
- card.appendChild(mapSelect);
+    // マップ選択をここに配置
+    const mapSelect = document.createElement("select");
+    mapSelect.className = "map-select";
+    mapSelect.id = `map-select-${r}`;
+    mapSelect.innerHTML = `<option value="">マップ未選択</option>`;
+    maps.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.name;
+      opt.textContent = m.name;
+      mapSelect.appendChild(opt);
+    });
+    mapSelect.value = mapName;
+    // 重複マップを無効化
+    [...mapSelect.options].forEach(opt => {
+      if (opt.value === "") return;
+      opt.disabled = usedMaps.has(opt.value) && opt.value !== mapName;
+    });
+    mapSelect.addEventListener("change", () => {
+      updateUsedMaps();
+      renderMapsDisplay();
+      saveState();
+    });
+    card.appendChild(mapSelect);
 
- globalContainer.appendChild(card);
- });
+    globalContainer.appendChild(card);
+  });
 
- // 2. ピック左（現在ラウンドだけ大きく）
- const currentContainer = document.getElementById("current-map-display");
- currentContainer.innerHTML = "";
- const sel = document.getElementById(`map-select-${currentRound}`);
- const mapName = sel ? sel.value : "";
- const mapData = maps.find(m => m.name === mapName);
+  // 2. ピック左（現在ラウンドだけ大きく）
+  const currentContainer = document.getElementById("current-map-display");
+  currentContainer.innerHTML = "";
+  const sel = document.getElementById(`map-select-${currentRound}`);
+  const mapName = sel ? sel.value : "";
+  const mapData = maps.find(m => m.name === mapName);
 
- const card = document.createElement("div");
- card.className = "current-map-card" + (mapName ? "" : " empty");
+  const card = document.createElement("div");
+  card.className = "current-map-card" + (mapName ? "" : " empty");
 
- if (mapName && mapData && mapData.img) {
- const img = document.createElement("img");
- img.src = mapData.img;
- img.alt = mapName;
- img.onerror = () => img.style.display = "none";
- card.appendChild(img);
- }
- const nameDiv = document.createElement("div");
- nameDiv.className = "map-name";
- nameDiv.textContent = mapName || "未選択";
- card.appendChild(nameDiv);
+  if (mapName && mapData && mapData.img) {
+    const img = document.createElement("img");
+    img.src = mapData.img;
+    img.alt = mapName;
+    img.onerror = () => img.style.display = "none";
+    card.appendChild(img);
+  }
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "map-name";
+  nameDiv.textContent = mapName || "未選択";
+  card.appendChild(nameDiv);
 
- currentContainer.appendChild(card);
- document.getElementById("current-map-round-label").textContent = currentRound;
+  currentContainer.appendChild(card);
+  document.getElementById("current-map-round-label").textContent = currentRound;
 
- // 高さ合わせ
- requestAnimationFrame(() => syncMapHeights());
+  // 高さ合わせ（自然な高さを下回らないように修正）
+  requestAnimationFrame(() => syncMapHeights());
 }
 
 function syncMapHeights() {
- ROUND_CONFIG[currentMode].forEach(r => {
- const survBlock = document.querySelector(`#global-surv-rounds .round-block[data-round="${r}"]`);
- const huntBlock = document.querySelector(`#global-hunt-rounds .round-block[data-round="${r}"]`);
- const card = document.querySelector(`#global-maps-display .map-card-sm[data-round="${r}"]`);
- if (survBlock && card) {
- const h = Math.max(
- survBlock.offsetHeight,
- huntBlock ? huntBlock.offsetHeight : 0
- );
- card.style.height = h + "px";
- }
- });
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const survBlock = document.querySelector(`#global-surv-rounds .round-block[data-round="${r}"]`);
+    const huntBlock = document.querySelector(`#global-hunt-rounds .round-block[data-round="${r}"]`);
+    const card = document.querySelector(`#global-maps-display .map-card-sm[data-round="${r}"]`);
+    if (survBlock && card) {
+      // いったんautoにして本来の高さを測る
+      card.style.height = "auto";
+      const natural = card.offsetHeight;
+      const h = Math.max(
+        survBlock.offsetHeight,
+        huntBlock ? huntBlock.offsetHeight : 0,
+        natural
+      );
+      card.style.height = h + "px";
+    }
+  });
 }
 
 function rebuildTeamBans() {
- const counts = getBanCounts(currentRound);
- createSlotsInContainer(document.getElementById("teamA-bans"), counts.teamA, "ban", "hunter");
- const title = document.getElementById("teamA-ban-title");
- title.textContent = counts.teamA === 0 ? `BAN（このラウンドは不可）` : `BAN（ハンター ${counts.teamA}体）`;
- createSlotsInContainer(document.getElementById("teamB-bans"), counts.teamB, "ban", "survivor");
- updateBanned();
+  const counts = getBanCounts(currentRound);
+  createSlotsInContainer(document.getElementById("teamA-bans"), counts.teamA, "ban", "hunter");
+  const title = document.getElementById("teamA-ban-title");
+  title.textContent = counts.teamA === 0 ? `BAN（このラウンドは不可）` : `BAN（ハンター ${counts.teamA}体）`;
+  createSlotsInContainer(document.getElementById("teamB-bans"), counts.teamB, "ban", "survivor");
+  updateBanned();
 }
 
 function buildRoundButtons() {
- const container = document.getElementById("round-buttons");
- container.innerHTML = "";
- const rounds = ROUND_CONFIG[currentMode];
- if (!rounds.includes(currentRound)) currentRound = rounds[0];
- rounds.forEach(r => {
- const btn = document.createElement("button");
- btn.className = "round-btn" + (r === "延長" ? " ot" : "") + (r === currentRound ? " active" : "");
- btn.textContent = r;
- btn.onclick = () => setCurrentRound(r);
- container.appendChild(btn);
- });
+  const container = document.getElementById("round-buttons");
+  container.innerHTML = "";
+  const rounds = ROUND_CONFIG[currentMode];
+  if (!rounds.includes(currentRound)) currentRound = rounds[0];
+  rounds.forEach(r => {
+    const btn = document.createElement("button");
+    btn.className = "round-btn" + (r === "延長" ? " ot" : "") + (r === currentRound ? " active" : "");
+    btn.textContent = r;
+    btn.onclick = () => setCurrentRound(r);
+    container.appendChild(btn);
+  });
 }
 
 function setMode(mode) {
- currentMode = mode;
- document.getElementById("btn-bo3").classList.toggle("active", mode === "BO3");
- document.getElementById("btn-bo5").classList.toggle("active", mode === "BO5");
- document.body.classList.toggle("bo5", mode === "BO5");
- buildRoundButtons();
- buildGlobalRounds();
- rebuildTeamBans();
- updateUsedMaps();
- renderMapsDisplay();
- saveState();
+  currentMode = mode;
+  document.getElementById("btn-bo3").classList.toggle("active", mode === "BO3");
+  document.getElementById("btn-bo5").classList.toggle("active", mode === "BO5");
+  document.body.classList.toggle("bo5", mode === "BO5");
+  buildRoundButtons();
+  buildGlobalRounds();
+  rebuildTeamBans();
+  updateUsedMaps();
+  renderMapsDisplay();
+  saveState();
 }
 
 function setCurrentRound(r) {
- currentRound = r;
- document.querySelectorAll(".round-btn").forEach(b => b.classList.toggle("active", b.textContent === r));
- document.querySelectorAll(".round-block").forEach(b => {
- b.classList.toggle("active-round", b.dataset.round === r);
- });
- rebuildTeamBans();
- updateUsedMaps();
- renderMapsDisplay();
- saveState();
+  currentRound = r;
+  document.querySelectorAll(".round-btn").forEach(b => b.classList.toggle("active", b.textContent === r));
+  document.querySelectorAll(".round-block").forEach(b => {
+    b.classList.toggle("active-round", b.dataset.round === r);
+  });
+  rebuildTeamBans();
+  updateUsedMaps();
+  renderMapsDisplay();
+  saveState();
 }
 
 function renderPool(filter = "all") {
- const pool = document.getElementById("char-pool");
- pool.innerHTML = "";
- characters.forEach(c => {
- if (filter !== "all" && c.type !== filter) return;
- pool.appendChild(createCharElement(c, true));
- });
+  const pool = document.getElementById("char-pool");
+  pool.innerHTML = "";
+  characters.forEach(c => {
+    if (filter !== "all" && c.type !== filter) return;
+    pool.appendChild(createCharElement(c, true));
+  });
 }
 
 function filterPool(type) {
- document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
- const btns = document.querySelectorAll(".filter-btn");
- if (type === "survivor") btns[0].classList.add("active");
- else if (type === "hunter") btns[1].classList.add("active");
- else btns[2].classList.add("active");
- renderPool(type);
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  const btns = document.querySelectorAll(".filter-btn");
+  if (type === "survivor") btns[0].classList.add("active");
+  else if (type === "hunter") btns[1].classList.add("active");
+  else btns[2].classList.add("active");
+  renderPool(type);
 }
 
 function updateBanned() {
- bannedNames.clear();
- ROUND_CONFIG[currentMode].forEach(r => {
- [`global-surv-used-${r}`, `global-hunt-used-${r}`].forEach(id => {
- const el = document.getElementById(id);
- if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
- });
- });
- ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
- const el = document.getElementById(id);
- if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
- });
- const r = currentRound;
- [`global-surv-ban-${r}`, `global-hunt-ban-${r}`].forEach(id => {
- const el = document.getElementById(id);
- if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
- });
- const active = document.querySelector(".filter-btn.active");
- let f = "all";
- if (active?.textContent.includes("サバイバー")) f = "survivor";
- else if (active?.textContent.includes("ハンター")) f = "hunter";
- renderPool(f);
- checkCompleteButton();
+  bannedNames.clear();
+  ROUND_CONFIG[currentMode].forEach(r => {
+    [`global-surv-used-${r}`, `global-hunt-used-${r}`].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+    });
+  });
+  ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+  });
+  const r = currentRound;
+  [`global-surv-ban-${r}`, `global-hunt-ban-${r}`].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+  });
+  const active = document.querySelector(".filter-btn.active");
+  let f = "all";
+  if (active?.textContent.includes("サバイバー")) f = "survivor";
+  else if (active?.textContent.includes("ハンター")) f = "hunter";
+  renderPool(f);
+  checkCompleteButton();
 }
 
 function updateUsedMaps() {
- usedMaps.clear();
- ROUND_CONFIG[currentMode].forEach(r => {
- const sel = document.getElementById(`map-select-${r}`);
- if (sel && sel.value) usedMaps.add(sel.value);
- });
- ROUND_CONFIG[currentMode].forEach(r => {
- const sel = document.getElementById(`map-select-${r}`);
- if (!sel) return;
- const currentVal = sel.value;
- [...sel.options].forEach(opt => {
- if (opt.value === "") return;
- opt.disabled = usedMaps.has(opt.value) && opt.value !== currentVal;
- });
- });
+  usedMaps.clear();
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (sel && sel.value) usedMaps.add(sel.value);
+  });
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (!sel) return;
+    const currentVal = sel.value;
+    [...sel.options].forEach(opt => {
+      if (opt.value === "") return;
+      opt.disabled = usedMaps.has(opt.value) && opt.value !== currentVal;
+    });
+  });
 }
 
 function checkCompleteButton() {
- const s = document.getElementById("teamA-surv").querySelectorAll(".char").length;
- const h = document.getElementById("teamB-hunter").querySelectorAll(".char").length;
- document.getElementById("complete-btn").disabled = !(s === 4 && h === 1);
+  const s = document.getElementById("teamA-surv").querySelectorAll(".char").length;
+  const h = document.getElementById("teamB-hunter").querySelectorAll(".char").length;
+  document.getElementById("complete-btn").disabled = !(s === 4 && h === 1);
 }
 
 function completePick() {
- const survChars = [...document.getElementById("teamA-surv").querySelectorAll(".char")].map(c => ({
- name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
- }));
- const huntChars = [...document.getElementById("teamB-hunter").querySelectorAll(".char")].map(c => ({
- name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
- }));
- const teamABans = [...document.getElementById("teamA-bans").querySelectorAll(".char")].map(c => ({
- name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
- }));
- const teamBBans = [...document.getElementById("teamB-bans").querySelectorAll(".char")].map(c => ({
- name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
- }));
- if (survChars.length !== 4 || huntChars.length !== 1) {
- document.getElementById("status-msg").textContent = "サバイバー4体とハンター1体をすべてピックしてください";
- return;
- }
- if (survChars.some(c => c.type !== "survivor") || huntChars.some(c => c.type !== "hunter")) {
- document.getElementById("status-msg").textContent = "役職が正しくありません";
- return;
- }
- const sUsed = document.getElementById(`global-surv-used-${currentRound}`);
- const hUsed = document.getElementById(`global-hunt-used-${currentRound}`);
- if (sUsed) {
- sUsed.querySelectorAll(".slot").forEach((slot, i) => {
- slot.innerHTML = "";
- if (survChars[i]) {
- slot.appendChild(createCharElement(survChars[i]));
- addClearButton(slot);
- }
- });
- }
- if (hUsed) {
- hUsed.querySelectorAll(".slot").forEach((slot, i) => {
- slot.innerHTML = "";
- if (huntChars[i]) {
- slot.appendChild(createCharElement(huntChars[i]));
- addClearButton(slot);
- }
- });
- }
- const sBan = document.getElementById(`global-surv-ban-${currentRound}`);
- if (sBan) {
- sBan.querySelectorAll(".slot").forEach((slot, i) => {
- slot.innerHTML = "";
- if (teamABans[i]) {
- slot.appendChild(createCharElement(teamABans[i]));
- addClearButton(slot);
- }
- });
- }
- const hBan = document.getElementById(`global-hunt-ban-${currentRound}`);
- if (hBan) {
- hBan.querySelectorAll(".slot").forEach((slot, i) => {
- slot.innerHTML = "";
- if (teamBBans[i]) {
- slot.appendChild(createCharElement(teamBBans[i]));
- addClearButton(slot);
- }
- });
- }
- ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
- document.getElementById(id).querySelectorAll(".slot").forEach(slot => slot.innerHTML = "");
- });
- updateBanned();
- document.getElementById("status-msg").textContent = `${currentRound} のグローバルBANに反映しました`;
- const rounds = ROUND_CONFIG[currentMode];
- const idx = rounds.indexOf(currentRound);
- if (idx >= 0 && idx < rounds.length - 1) setCurrentRound(rounds[idx + 1]);
- saveState();
+  const survChars = [...document.getElementById("teamA-surv").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+  const huntChars = [...document.getElementById("teamB-hunter").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+  const teamABans = [...document.getElementById("teamA-bans").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+  const teamBBans = [...document.getElementById("teamB-bans").querySelectorAll(".char")].map(c => ({
+    name: c.dataset.name, type: c.dataset.type, img: c.dataset.img || ""
+  }));
+  if (survChars.length !== 4 || huntChars.length !== 1) {
+    document.getElementById("status-msg").textContent = "サバイバー4体とハンター1体をすべてピックしてください";
+    return;
+  }
+  if (survChars.some(c => c.type !== "survivor") || huntChars.some(c => c.type !== "hunter")) {
+    document.getElementById("status-msg").textContent = "役職が正しくありません";
+    return;
+  }
+  const sUsed = document.getElementById(`global-surv-used-${currentRound}`);
+  const hUsed = document.getElementById(`global-hunt-used-${currentRound}`);
+  if (sUsed) {
+    sUsed.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (survChars[i]) {
+        slot.appendChild(createCharElement(survChars[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+  if (hUsed) {
+    hUsed.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (huntChars[i]) {
+        slot.appendChild(createCharElement(huntChars[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+  const sBan = document.getElementById(`global-surv-ban-${currentRound}`);
+  if (sBan) {
+    sBan.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (teamABans[i]) {
+        slot.appendChild(createCharElement(teamABans[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+  const hBan = document.getElementById(`global-hunt-ban-${currentRound}`);
+  if (hBan) {
+    hBan.querySelectorAll(".slot").forEach((slot, i) => {
+      slot.innerHTML = "";
+      if (teamBBans[i]) {
+        slot.appendChild(createCharElement(teamBBans[i]));
+        addClearButton(slot);
+      }
+    });
+  }
+  ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
+    document.getElementById(id).querySelectorAll(".slot").forEach(slot => slot.innerHTML = "");
+  });
+  updateBanned();
+  document.getElementById("status-msg").textContent = `${currentRound} のグローバルBANに反映しました`;
+  const rounds = ROUND_CONFIG[currentMode];
+  const idx = rounds.indexOf(currentRound);
+  if (idx >= 0 && idx < rounds.length - 1) setCurrentRound(rounds[idx + 1]);
+  saveState();
 }
 
 function resetAll() {
- document.querySelectorAll(".slot").forEach(s => s.innerHTML = "");
- bannedNames.clear();
- usedMaps.clear();
- document.getElementById("status-msg").textContent = "";
- ROUND_CONFIG[currentMode].forEach(r => {
- const sel = document.getElementById(`map-select-${r}`);
- if (sel) sel.value = "";
- });
- document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
- const survivorBtn = [...document.querySelectorAll(".filter-btn")].find(b => b.textContent.includes("サバイバー"));
- if (survivorBtn) survivorBtn.classList.add("active");
- renderPool("survivor");
- updateUsedMaps();
- renderMapsDisplay();
- checkCompleteButton();
- localStorage.removeItem(STORAGE_KEY);
- saveState();
+  document.querySelectorAll(".slot").forEach(s => s.innerHTML = "");
+  bannedNames.clear();
+  usedMaps.clear();
+  document.getElementById("status-msg").textContent = "";
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (sel) sel.value = "";
+  });
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  const survivorBtn = [...document.querySelectorAll(".filter-btn")].find(b => b.textContent.includes("サバイバー"));
+  if (survivorBtn) survivorBtn.classList.add("active");
+  renderPool("survivor");
+  updateUsedMaps();
+  renderMapsDisplay();
+  checkCompleteButton();
+  localStorage.removeItem(STORAGE_KEY);
+  saveState();
 }
 
 async function saveAsImage() {
- const btn = document.querySelector(".save-btn");
- const original = btn.textContent;
- btn.textContent = "保存中...";
- btn.disabled = true;
- try {
- const canvas = await html2canvas(document.getElementById("capture-area"), {
- backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim() || "#0d0d12",
- scale: 2, useCORS: true, logging: false
- });
- const link = document.createElement("a");
- const now = new Date();
- const pad = n => n.toString().padStart(2, "0");
- link.download = `IDV_Pick_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.png`;
- link.href = canvas.toDataURL("image/png");
- link.click();
- } catch (err) {
- document.getElementById("status-msg").textContent = "画像保存に失敗しました";
- } finally {
- btn.textContent = original;
- btn.disabled = false;
- }
+  const btn = document.querySelector(".save-btn");
+  const original = btn.textContent;
+  btn.textContent = "保存中...";
+  btn.disabled = true;
+  try {
+    const canvas = await html2canvas(document.getElementById("capture-area"), {
+      backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim() || "#0d0d12",
+      scale: 2, useCORS: true, logging: false
+    });
+    const link = document.createElement("a");
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, "0");
+    link.download = `IDV_Pick_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    document.getElementById("status-msg").textContent = "画像保存に失敗しました";
+  } finally {
+    btn.textContent = original;
+    btn.disabled = false;
+  }
 }
 
 function toggleTheme() {
- const isLight = document.body.classList.toggle("light");
- document.getElementById("theme-btn").textContent = isLight ? "ダークモードへ" : "ライトモードへ";
- localStorage.setItem("idv-pick-theme", isLight ? "light" : "dark");
+  const isLight = document.body.classList.toggle("light");
+  document.getElementById("theme-btn").textContent = isLight ? "ダークモードへ" : "ライトモードへ";
+  localStorage.setItem("idv-pick-theme", isLight ? "light" : "dark");
 }
 
 // 初期化
 if (localStorage.getItem("idv-pick-theme") === "light") {
- document.body.classList.add("light");
- document.getElementById("theme-btn").textContent = "ダークモードへ";
+  document.body.classList.add("light");
+  document.getElementById("theme-btn").textContent = "ダークモードへ";
 }
 
 createSlotsInContainer(document.getElementById("teamA-surv"), 4, "pick", "survivor");
@@ -1542,11 +1545,11 @@ renderPool('survivor');
 checkCompleteButton();
 
 ["teamA-surv", "teamB-hunter"].forEach(id => {
- new MutationObserver(checkCompleteButton).observe(document.getElementById(id), { childList: true, subtree: true });
+  new MutationObserver(checkCompleteButton).observe(document.getElementById(id), { childList: true, subtree: true });
 });
 document.querySelectorAll(".team-name").forEach(el => el.addEventListener("input", saveState));
 document.addEventListener("contextmenu", e => {
- if (e.target.closest(".char")) e.preventDefault();
+  if (e.target.closest(".char")) e.preventDefault();
 });
 loadState();
 </script>
