@@ -1207,16 +1207,35 @@ function filterPool(type) {
 
 function updateBanned() {
   bannedNames.clear();
+
+  // 1. 全ラウンドの「使用」したキャラのみ永久BAN
   ROUND_CONFIG[currentMode].forEach(r => {
-    [`global-surv-used-${r}`, `global-surv-ban-${r}`, `global-hunt-used-${r}`, `global-hunt-ban-${r}`].forEach(id => {
+    [`global-surv-used-${r}`, `global-hunt-used-${r}`].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+      if (el) {
+        el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+      }
     });
   });
+
+  // 2. 現在のチームBAN・PICK枠（今のラウンドで選択中のもの）
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+    if (el) {
+      el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+    }
   });
+
+  // 3. 現在ラウンドのグローバルBAN枠も念のため反映（手動で入れた場合など）
+  const r = currentRound;
+  [`global-surv-ban-${r}`, `global-hunt-ban-${r}`].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
+    }
+  });
+
+  // プール再描画
   const active = document.querySelector(".filter-btn.active");
   let f = "all";
   if (active?.textContent.includes("サバイバー")) f = "survivor";
@@ -1224,7 +1243,6 @@ function updateBanned() {
   renderPool(f);
   checkCompleteButton();
 }
-
 function checkCompleteButton() {
   const s = document.getElementById("teamA-surv").querySelectorAll(".char").length;
   const h = document.getElementById("teamB-hunter").querySelectorAll(".char").length;
