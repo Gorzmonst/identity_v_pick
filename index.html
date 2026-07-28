@@ -398,6 +398,31 @@
     font-size: 10px;
   }
 
+  .map-select {
+    width: 100%;
+    margin-top: 3px;
+    padding: 3px 4px;
+    font-size: 0.68em;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    background: var(--slot-bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .map-select:focus {
+    outline: 1px solid var(--blue);
+  }
+  .round-block.active-round .map-select {
+    border-color: var(--blue);
+  }
+  .round-block.active-round.ot .map-select {
+    border-color: var(--red);
+  }
+  body.bo5 .map-select {
+    font-size: 0.6em;
+    padding: 2px 3px;
+  }
+
   body.bo5 .slot {
     width: 42px;
     height: 50px;
@@ -680,7 +705,7 @@
     white-space: nowrap;
   }
   .sidebar h1 br {
-    display: none; /* 改行を消して1行にする */
+    display: none;
   }
 
   .side-label {
@@ -889,7 +914,20 @@ const characters = [
   {name:"歯医者", type:"hunter", img:"https://r.res.easebar.com/pic/20260518/6915da4e-28c3-4c1b-8329-b81bd4d37aea.png"}
 ];
 
+const maps = [
+  "軍需工場",
+  "赤の教会",
+  "聖心病院",
+  "湖景村",
+  "月の河公園",
+  "レオの思い出",
+  "永眠町",
+  "中華街",
+  "罪の森"
+];
+
 const bannedNames = new Set();
+const usedMaps = new Set();
 let currentMode = "BO3";
 let currentRound = "R1";
 let draggedChar = null;
@@ -924,13 +962,18 @@ function saveState() {
     round: currentRound,
     teamAName: document.querySelector(".team-a .team-name").textContent,
     teamBName: document.querySelector(".team-b .team-name").textContent,
-    slots: {}
+    slots: {},
+    maps: {}
   };
   getAllSlotIds().forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       state.slots[id] = [...el.querySelectorAll(".char")].map(c => c.dataset.name);
     }
+  });
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (sel) state.maps[r] = sel.value;
   });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
@@ -959,6 +1002,13 @@ function loadState() {
           }
         });
       });
+    }
+    if (state.maps) {
+      Object.entries(state.maps).forEach(([r, val]) => {
+        const sel = document.getElementById(`map-select-${r}`);
+        if (sel) sel.value = val || "";
+      });
+      updateUsedMaps();
     }
     updateBanned();
     checkCompleteButton();
@@ -1106,6 +1156,24 @@ function buildGlobalRounds() {
     sContent.appendChild(sUsed);
     sContent.appendChild(sBan);
     sBlock.appendChild(sContent);
+
+    // マップ選択
+    const mapSelect = document.createElement("select");
+    mapSelect.className = "map-select";
+    mapSelect.id = `map-select-${r}`;
+    mapSelect.innerHTML = `<option value="">マップ未選択</option>`;
+    maps.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      mapSelect.appendChild(opt);
+    });
+    mapSelect.addEventListener("change", () => {
+      updateUsedMaps();
+      saveState();
+    });
+    sBlock.appendChild(mapSelect);
+
     survC.appendChild(sBlock);
     createSlotsInContainer(sUsedSlots, 4, "pick", "survivor");
     createSlotsInContainer(sBanSlots, counts.teamA, "ban", "hunter");
@@ -1137,6 +1205,7 @@ function buildGlobalRounds() {
     createSlotsInContainer(hBanSlots, counts.teamB, "ban", "survivor");
   });
   updateBanned();
+  updateUsedMaps();
 }
 
 function rebuildTeamBans() {
@@ -1174,6 +1243,7 @@ function setMode(mode) {
   buildRoundButtons();
   buildGlobalRounds();
   rebuildTeamBans();
+  updateUsedMaps();
   saveState();
 }
 
@@ -1184,6 +1254,7 @@ function setCurrentRound(r) {
     b.classList.toggle("active-round", b.dataset.round === r);
   });
   rebuildTeamBans();
+  updateUsedMaps();
   saveState();
 }
 
@@ -1208,7 +1279,7 @@ function filterPool(type) {
 function updateBanned() {
   bannedNames.clear();
 
-  // 1. 全ラウンドの「使用」したキャラのみ永久BAN
+  // 全ラウンドの「使用」したキャラのみ永久BAN
   ROUND_CONFIG[currentMode].forEach(r => {
     [`global-surv-used-${r}`, `global-hunt-used-${r}`].forEach(id => {
       const el = document.getElementById(id);
@@ -1218,7 +1289,7 @@ function updateBanned() {
     });
   });
 
-  // 2. 現在のチームBAN・PICK枠（今のラウンドで選択中のもの）
+  // 現在のチームBAN・PICK枠
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -1226,7 +1297,7 @@ function updateBanned() {
     }
   });
 
-  // 3. 現在ラウンドのグローバルBAN枠も念のため反映（手動で入れた場合など）
+  // 現在ラウンドのグローバルBAN枠も反映
   const r = currentRound;
   [`global-surv-ban-${r}`, `global-hunt-ban-${r}`].forEach(id => {
     const el = document.getElementById(id);
@@ -1235,7 +1306,6 @@ function updateBanned() {
     }
   });
 
-  // プール再描画
   const active = document.querySelector(".filter-btn.active");
   let f = "all";
   if (active?.textContent.includes("サバイバー")) f = "survivor";
@@ -1243,6 +1313,27 @@ function updateBanned() {
   renderPool(f);
   checkCompleteButton();
 }
+
+function updateUsedMaps() {
+  usedMaps.clear();
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (sel && sel.value) {
+      usedMaps.add(sel.value);
+    }
+  });
+
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (!sel) return;
+    const currentVal = sel.value;
+    [...sel.options].forEach(opt => {
+      if (opt.value === "") return;
+      opt.disabled = usedMaps.has(opt.value) && opt.value !== currentVal;
+    });
+  });
+}
+
 function checkCompleteButton() {
   const s = document.getElementById("teamA-surv").querySelectorAll(".char").length;
   const h = document.getElementById("teamB-hunter").querySelectorAll(".char").length;
@@ -1328,15 +1419,21 @@ function completePick() {
 function resetAll() {
   document.querySelectorAll(".slot").forEach(s => s.innerHTML = "");
   bannedNames.clear();
+  usedMaps.clear();
   document.getElementById("status-msg").textContent = "";
 
-  // フィルターボタンを初期状態（サバイバー）に戻す
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const sel = document.getElementById(`map-select-${r}`);
+    if (sel) sel.value = "";
+  });
+
   document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
   const survivorBtn = [...document.querySelectorAll(".filter-btn")]
     .find(b => b.textContent.includes("サバイバー"));
   if (survivorBtn) survivorBtn.classList.add("active");
 
   renderPool("survivor");
+  updateUsedMaps();
   checkCompleteButton();
   localStorage.removeItem(STORAGE_KEY);
   saveState();
