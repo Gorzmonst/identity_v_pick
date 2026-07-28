@@ -235,67 +235,75 @@
   .used-area .slots { justify-content: flex-start; }
   .ban-area .slots { justify-content: flex-end; }
 
-  /* ===== マップ表示エリア（メニューとサバイバーの間） ===== */
-  .maps-row {
+  /* ===== マップ表示（サバイバーの左） ===== */
+  .teams-wrapper {
+    display: flex;
+    gap: 8px;
+  }
+  .maps-panel {
+    width: 120px;
+    flex-shrink: 0;
     background: var(--panel);
     border: 2px solid var(--border2);
     border-radius: 6px;
-    padding: 6px 8px;
-    margin-bottom: 8px;
+    padding: 6px 5px;
+    display: flex;
+    flex-direction: column;
   }
   .maps-title {
-    font-size: 0.78em;
+    font-size: 0.74em;
     color: var(--text-muted);
     text-align: center;
     margin-bottom: 6px;
   }
   .maps-display {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
   }
   .map-card {
-    width: 110px;
     background: var(--slot-bg);
     border: 2px solid var(--slot-border);
-    border-radius: 6px;
+    border-radius: 5px;
     overflow: hidden;
     text-align: center;
     transition: 0.15s;
   }
   .map-card.active-map {
     border-color: var(--gold);
-    box-shadow: 0 0 8px rgba(201,162,39,0.4);
+    box-shadow: 0 0 6px rgba(201,162,39,0.45);
   }
   .map-card img {
     width: 100%;
-    height: 62px;
+    height: 58px;
     object-fit: cover;
     background: var(--char-noimg);
     display: block;
   }
   .map-card .map-name {
-    font-size: 0.72em;
-    padding: 4px 2px;
-    line-height: 1.2;
+    font-size: 0.7em;
+    padding: 3px 2px 1px;
+    line-height: 1.15;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .map-card .map-round {
-    font-size: 0.62em;
+    font-size: 0.6em;
     color: var(--text-dim);
     padding-bottom: 3px;
   }
   .map-card.empty .map-name {
     color: var(--text-dim);
-    padding: 20px 4px;
+    padding: 18px 4px;
   }
 
   .teams {
     display: flex;
     gap: 8px;
+    flex: 1;
+    min-width: 0;
   }
   .team {
     flex: 1;
@@ -544,11 +552,11 @@
   body.bo5 .global-row {
     margin-bottom: 5px;
   }
-  body.bo5 .map-card {
-    width: 95px;
+  body.bo5 .maps-panel {
+    width: 105px;
   }
   body.bo5 .map-card img {
-    height: 52px;
+    height: 48px;
   }
 
 @media (max-height: 520px), (orientation: landscape) and (max-width: 950px) {
@@ -678,15 +686,15 @@
     width: 38px;
     height: 48px;
   }
-  .map-card {
-    width: 85px;
+  .maps-panel {
+    width: 90px;
   }
   .map-card img {
-    height: 48px;
+    height: 42px;
   }
 }
 
-/* スマホ強制スケール＋アイコンサイズ調整 */
+/* スマホ強制スケール */
 @media screen and (max-width: 900px) {
   body {
     zoom: 0.5;
@@ -746,8 +754,8 @@
     height: 100px !important;
   }
 
-  .map-card {
-    width: 140px !important;
+  .maps-panel {
+    width: 160px !important;
   }
   .map-card img {
     height: 80px !important;
@@ -825,6 +833,21 @@
     flex-direction: row !important;
     gap: 8px;
   }
+
+  .teams-wrapper {
+    flex-direction: column;
+  }
+  .maps-panel {
+    width: 100% !important;
+  }
+  .maps-display {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .map-card {
+    width: 140px;
+  }
 }
 
 .char,
@@ -870,26 +893,28 @@
       </div>
     </div>
 
-    <!-- マップ表示エリア（メニューとサバイバーの間） -->
-    <div class="maps-row">
-      <div class="maps-title">使用マップ</div>
-      <div class="maps-display" id="maps-display"></div>
-    </div>
-
-    <div class="teams">
-      <div class="team team-a">
-        <div class="team-name" contenteditable="true">TEAM A（サバイバー）※テキスト入力可</div>
-        <div class="section-title" id="teamA-ban-title">BAN（ハンター）</div>
-        <div class="slots" id="teamA-bans"></div>
-        <div class="section-title">PICK サバイバー</div>
-        <div class="slots" id="teamA-surv"></div>
+    <!-- ここがサバイバーの左 -->
+    <div class="teams-wrapper">
+      <div class="maps-panel">
+        <div class="maps-title">使用マップ</div>
+        <div class="maps-display" id="maps-display"></div>
       </div>
-      <div class="team team-b">
-        <div class="team-name" contenteditable="true">TEAM B（ハンター）※テキスト入力可</div>
-        <div class="section-title">BAN（サバイバー 4体）</div>
-        <div class="slots" id="teamB-bans"></div>
-        <div class="section-title">PICK ハンター</div>
-        <div class="slots" id="teamB-hunter"></div>
+
+      <div class="teams">
+        <div class="team team-a">
+          <div class="team-name" contenteditable="true">TEAM A（サバイバー）※テキスト入力可</div>
+          <div class="section-title" id="teamA-ban-title">BAN（ハンター）</div>
+          <div class="slots" id="teamA-bans"></div>
+          <div class="section-title">PICK サバイバー</div>
+          <div class="slots" id="teamA-surv"></div>
+        </div>
+        <div class="team team-b">
+          <div class="team-name" contenteditable="true">TEAM B（ハンター）※テキスト入力可</div>
+          <div class="section-title">BAN（サバイバー 4体）</div>
+          <div class="slots" id="teamB-bans"></div>
+          <div class="section-title">PICK ハンター</div>
+          <div class="slots" id="teamB-hunter"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -906,6 +931,7 @@
 </div>
 
 <script>
+/* ここから下のJSは前回と同じなので省略せず全文を出します（長いですがコピペ用） */
 const characters = [
   {name:"庭師", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/ed0150f9-e1f7-4d3e-9428-c08b253a6316.png"},
   {name:"弁護士", type:"survivor", img:"https://r.res.easebar.com/pic/20210618/1270f6b8-18d5-4dc5-9351-89e5fa71ac35.png"},
@@ -1241,7 +1267,6 @@ function buildGlobalRounds() {
     sContent.appendChild(sBan);
     sBlock.appendChild(sContent);
 
-    // マップ選択ドロップダウン
     const mapSelect = document.createElement("select");
     mapSelect.className = "map-select";
     mapSelect.id = `map-select-${r}`;
@@ -1405,34 +1430,21 @@ function filterPool(type) {
 
 function updateBanned() {
   bannedNames.clear();
-
-  // 全ラウンドの「使用」したキャラのみ永久BAN
   ROUND_CONFIG[currentMode].forEach(r => {
     [`global-surv-used-${r}`, `global-hunt-used-${r}`].forEach(id => {
       const el = document.getElementById(id);
-      if (el) {
-        el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
-      }
+      if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
     });
   });
-
-  // 現在のチームBAN・PICK枠
   ["teamA-bans", "teamA-surv", "teamB-bans", "teamB-hunter"].forEach(id => {
     const el = document.getElementById(id);
-    if (el) {
-      el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
-    }
+    if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
   });
-
-  // 現在ラウンドのグローバルBAN枠も反映
   const r = currentRound;
   [`global-surv-ban-${r}`, `global-hunt-ban-${r}`].forEach(id => {
     const el = document.getElementById(id);
-    if (el) {
-      el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
-    }
+    if (el) el.querySelectorAll(".char").forEach(c => bannedNames.add(c.dataset.name));
   });
-
   const active = document.querySelector(".filter-btn.active");
   let f = "all";
   if (active?.textContent.includes("サバイバー")) f = "survivor";
@@ -1445,11 +1457,8 @@ function updateUsedMaps() {
   usedMaps.clear();
   ROUND_CONFIG[currentMode].forEach(r => {
     const sel = document.getElementById(`map-select-${r}`);
-    if (sel && sel.value) {
-      usedMaps.add(sel.value);
-    }
+    if (sel && sel.value) usedMaps.add(sel.value);
   });
-
   ROUND_CONFIG[currentMode].forEach(r => {
     const sel = document.getElementById(`map-select-${r}`);
     if (!sel) return;
