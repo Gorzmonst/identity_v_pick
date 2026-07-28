@@ -1534,7 +1534,8 @@ function updateBanned() {
 
 function updateUsedMaps() {
   usedMaps.clear();
-  Object.values(mapSelections).forEach(name => {
+  ROUND_CONFIG[currentMode].forEach(r => {
+    const name = mapSelections[r];
     if (name) usedMaps.add(name);
   });
 }
